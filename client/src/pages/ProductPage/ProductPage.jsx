@@ -3,7 +3,7 @@ import { FaSearch, FaPlus, FaTimes } from "react-icons/fa";
 import "./ProductPage.css"; 
 
 const ProductPage = () => {
-  const APIBaseurl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+  const APIBaseurl = import.meta.env.VITE_API_BASE_URL || "http://localhost:4000";
 
   const [masterProductList, setMasterProductList] = useState([]);
   const [displayedProducts, setDisplayedProducts] = useState([]);
