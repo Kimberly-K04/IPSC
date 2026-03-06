@@ -1,12 +1,60 @@
 # IPSC
 
+## ERD 
+
+- Relationship to Implement
+  
+![erd_diagram](./dbdiagram.io.png)
+
+## Structure
+
+```bash
+├── client
+│   ├── db.json
+│   ├── eslint.config.js
+│   ├── index.html
+│   ├── package.json
+│   ├── pnpm-lock.yaml
+│   ├── public
+│   ├── README.md
+│   ├── src
+│   │   ├── App.css
+│   │   ├── App.jsx
+│   │   ├── assets
+│   │   ├── components
+│   │   ├── designs
+│   │   ├── index.css
+│   │   ├── main.jsx
+│   │   ├── pages
+│   │   └── routes.jsx
+├── dbdiagram.io.png
+├── instance
+├── migrations
+├── README.md
+├── requirements.txt
+└── server
+    ├── app.py
+    ├── models
+    │   ├── alert.py
+    │   ├── dbconn.py
+    │   ├── order.py
+    │   ├── product.py
+    │   ├── sale.py
+    │   ├── supplier.py
+    │   └── user.py
+    └── routes
+    └── seed.py
+    └── services
+
+```
+
 ## Setup
 
 ```bash
 cd <your-repo>
 pnpm install --prefix client
-pyhton -m venv .venv
-source ./venv/bin/activate
+python -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
 ```
 

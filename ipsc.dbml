@@ -1,0 +1,63 @@
+// Use DBML to define your database structure
+// Docs: https://dbml.dbdiagram.io/docs
+
+Table users {
+  id integer [primary key]
+  fullname text [not null]
+  email text [not null]
+  role text [default:  'customer']
+}
+
+Table products {
+  id integer [primary key]
+  product_name text [not null]
+  stock integer [not null]
+  price decimal [not null]
+  supplier_id integer [not null]
+}
+
+Table sales {
+  id integer [primary key]
+  order_id integer
+  product_id integer
+  quantity integer
+  total_price decimal
+}
+
+Table orders{
+  id integer [primary key]
+  user_id integer [not null]
+  order_date timestamp [default:  'now()']
+  status text [not null]
+  total_amount decimal [not null]
+}
+
+Table suppliers{
+  id integer [primary key]
+  fullname text [not null]
+  contact text [not null]
+  email text [not null]
+}
+
+Table alerts{
+  id integer [primary key]
+  product_id integer [not null]
+  is_resolved bool [not null]
+  type text  [not null]
+}
+
+Ref products: suppliers.id > products.supplier_id
+
+Ref sales: orders.id>sales.order_id
+Ref sales: products.id> sales.product_id
+
+Ref orders: users.id> orders.user_id
+
+Ref alerts: products.id> alerts.product_id
+
+
+// Ref user_posts: posts.user_id > users.id // many-to-one
+
+// Ref: users.id < users.following_user_id
+
+// Ref: users.id < follows.followed_user_id
