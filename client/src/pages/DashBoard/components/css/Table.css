@@ -1,0 +1,9 @@
+
+.dash-table{
+    margin-block: 60px;
+    margin-inline: 15px;
+    box-shadow: 1px 1px 14px var(--color);
+    border-radius: 20px;
+    overflow: hidden;
+    padding: 10px;
+}

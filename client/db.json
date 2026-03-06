@@ -1,0 +1,300 @@
+{
+  "products": [
+    {
+      "id": "1",
+      "name": "Wireless Keyboard",
+      "sku": "KB-001",
+      "category": "Electronics",
+      "price": 4500,
+      "stock": 85,
+      "reorder_level": 20,
+      "demand_forecast": 120,
+      "last_updated": "2025-10-01",
+      "sales": [
+        {
+          "date": "2025-09-15",
+          "unitsSold": 5
+        },
+        {
+          "date": "2025-09-22",
+          "unitsSold": 7
+        },
+        {
+          "date": "2025-09-29",
+          "unitsSold": 6
+        },
+        {
+          "date": "2025-10-06",
+          "unitsSold": 8
+        },
+        {
+          "date": "2025-10-13",
+          "unitsSold": 9
+        }
+      ],
+      "suppliers": [
+        {
+          "id": "1",
+          "name": "TechLink Supplies",
+          "contact_person": "Sarah Kim",
+          "email": "orders@techlink.co.ke",
+          "phone": "+254700123456",
+          "lead_time_days": 7,
+          "rating": 4.6
+        }
+      ],
+      "alerts": []
+    },
+    {
+      "id": "2",
+      "name": "Bluetooth Mouse",
+      "sku": "MS-002",
+      "category": "Electronics",
+      "price": 2500,
+      "stock": 40,
+      "reorder_level": 10,
+      "demand_forecast": 80,
+      "last_updated": "2025-10-01",
+      "sales": [
+        {
+          "date": "2025-09-15",
+          "unitsSold": 3
+        },
+        {
+          "date": "2025-09-22",
+          "unitsSold": 10
+        },
+        {
+          "date": "2025-09-29",
+          "unitsSold": 0
+        },
+        {
+          "date": "2025-10-06",
+          "unitsSold": 20
+        },
+        {
+          "date": "2025-10-13",
+          "unitsSold": 3
+        }
+      ],
+      "suppliers": [
+        {
+          "id": "1",
+          "name": "TechLink Supplies",
+          "contact_person": "Sarah Kim",
+          "email": "orders@techlink.co.ke",
+          "phone": "+254700123456",
+          "lead_time_days": 7,
+          "rating": 4.6
+        }
+      ],
+      "alerts": []
+    },
+    {
+      "id": "3",
+      "name": "Laptop Stand",
+      "sku": "LP-003",
+      "category": "Office",
+      "price": 3200,
+      "stock": 4,
+      "reorder_level": 10,
+      "demand_forecast": 25,
+      "last_updated": "2025-10-01",
+      "sales": [
+        {
+          "date": "2025-09-15",
+          "unitsSold": 50
+        },
+        {
+          "date": "2025-09-22",
+          "unitsSold": 17
+        },
+        {
+          "date": "2025-09-29",
+          "unitsSold": 16
+        },
+        {
+          "date": "2025-10-06",
+          "unitsSold": 2
+        },
+        {
+          "date": "2025-10-13",
+          "unitsSold": 1
+        }
+      ],
+      "suppliers": [
+        {
+          "id": "1",
+          "name": "TechLink Supplies",
+          "contact_person": "Sarah Kim",
+          "email": "orders@techlink.co.ke",
+          "phone": "+254700123456",
+          "lead_time_days": 7,
+          "rating": 4.6
+        }
+      ],
+      "alerts": [
+        {
+          "id": "1",
+          "product_id": 3,
+          "message": "Stock running low for Laptop Stand",
+          "type": "low stock",
+          "created_at": "2025-10-10T10:12:00Z",
+          "status": "unread"
+        }
+      ]
+    },
+    {
+      "id": "5ac0",
+      "name": "Phone Charger",
+      "sku": "PHC-123",
+      "category": "Electronics",
+      "price": 500,
+      "stock": 9,
+      "reorder_level": 10,
+      "demand_forecast": 40,
+      "last_updated": "Sat Oct 18 2025",
+      "sales": [],
+      "suppliers": [
+        {
+          "id": "1",
+          "name": "TechLink Supplies",
+          "contact_person": "Sarah Kim",
+          "email": "orders@techlink.co.ke",
+          "phone": "+254700123456",
+          "lead_time_days": 7,
+          "rating": 4.6
+        }
+      ],
+      "alerts": [
+        {
+          "id": "1",
+          "product_id": 3,
+          "message": "Stock running low for Phone Charger",
+          "type": "low stock",
+          "created_at": "2025-10-10T10:12:00Z",
+          "status": "unread"
+        }
+      ]
+    },
+    {
+      "id": "6acd",
+      "name": "Office Chair",
+      "sku": "OFC-456",
+      "category": "Office",
+      "price": 1500,
+      "stock": 30,
+      "reorder_level": 10,
+      "demand_forecast": 40,
+      "last_updated": "Sat Oct 18 2025",
+      "sales": [],
+      "suppliers": [],
+      "alerts": []
+    },
+    {
+      "id": "be85",
+      "name": "Curtains",
+      "sku": "CCH-190",
+      "category": "Home",
+      "price": 5000,
+      "stock": 40,
+      "reorder_level": 15,
+      "demand_forecast": 40,
+      "last_updated": "Sat Oct 18 2025",
+      "sales": [],
+      "suppliers": [],
+      "alerts": []
+    },
+    {
+      "id": "0afa",
+      "name": "Hp Elite-Book 840G6 512GB ssd 16GB RAM",
+      "sku": "HPE-467",
+      "category": "Electronics",
+      "price": 40000,
+      "stock": 30,
+      "reorder_level": 15,
+      "demand_forecast": 40,
+      "last_updated": "Mon Oct 20 2025",
+      "sales": [],
+      "suppliers": [
+        {
+          "id": 1,
+          "name": "TechLink Supplies",
+          "contact_person": "Sarah Kim",
+          "email": "orders@techlink.co.ke",
+          "phone": "+254700123456",
+          "lead_time_days": 7,
+          "rating": 4.6
+        }
+      ],
+      "alerts": [
+        {
+          "id": "1",
+          "product_id": 3,
+          "message": "Stock running low for Hp Elite-Book 840G6",
+          "type": "low stock",
+          "created_at": "2025-10-10T10:12:00Z",
+          "status": "unread"
+        }
+      ]
+    },
+    {
+      "id": "273a",
+      "name": "Woolen Carpet",
+      "sku": "WCA-589",
+      "category": "Home",
+      "price": 10000,
+      "stock": 20,
+      "reorder_level": 10,
+      "demand_forecast": 40,
+      "last_updated": "Mon Oct 20 2025",
+      "sales": [],
+      "suppliers": [],
+      "alerts": []
+    },
+    {
+      "id": "b343",
+      "name": "Cotton Carpet",
+      "sku": "HOM-123",
+      "category": "Home",
+      "price": 1500,
+      "stock": 10,
+      "reorder_level": 5,
+      "demand_forecast": 40,
+      "last_updated": "Fri Nov 07 2025",
+      "sales": [],
+      "suppliers": [],
+      "alerts": []
+    },
+    {
+      "id": "caf1",
+      "name": "Iphone",
+      "category": "Electronics",
+      "stock": 5,
+      "price": 200000,
+      "sku": "SKU-1247",
+      "sales": [],
+      "suppliers": [],
+      "alerts": [],
+      "last_updated": "Mon Dec 01 2025"
+    }
+  ],
+  "orders": [
+    {
+      "id": "1",
+      "supplier_id": "1",
+      "product_id": 3,
+      "quantity": 50,
+      "status": "pending"
+    }
+  ],
+  "users": [
+    {
+      "id": "1",
+      "name": "Jack",
+      "email": "jack@ipsc.com",
+      "role": "admin",
+      "avatar": "https://i.pravatar.cc/150?img=12"
+    }
+  ]
+}

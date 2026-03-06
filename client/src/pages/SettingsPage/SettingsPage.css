@@ -1,0 +1,93 @@
+.settings-page {
+  padding: 30px;
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* Tabs */
+.settings-tabs {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 25px;
+}
+
+.tab {
+  padding: 12px 20px;
+  background-color: var(--tabsBg);
+  border: none;
+  border-radius: 10px;
+  font-size: 15px;
+  cursor: pointer;
+  color: var(--color);
+  box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+  transition: 0.2s;
+}
+
+.tab:hover { background-color: var(--hover); }
+.tab.active { background-color: #0066ff; color: #fff; }
+
+/* Card */
+.settings-card {
+  background-color: var(--tabsBg);
+  padding: 25px;
+  border-radius: 15px;
+  max-width: 550px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.1);
+}
+
+.content { display: flex; flex-direction: column; gap: 15px; }
+
+.avatar {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: var(--color);
+  margin: 10px auto;
+}
+
+.profile-form input{
+  display: block;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+/* Inputs */
+.settings-card input {
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #cdd3e0;
+  outline: none;
+}
+
+/* Toggle row */
+.toggle-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Buttons */
+.save-btn {
+  padding: 12px;
+  background-color: var(--hover);
+  border: none;
+  border-radius: 10px;
+  color: var(--color);
+  cursor: pointer;
+}
+
+.save-btn:hover { background-color: var(--hover); }
+
+/* ---------------- GLOBAL DARK MODE OVERLAY ---------------- */
+/* body.dark-mode::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.4);
+  pointer-events: none;
+  z-index: 999;
+  transition: background-color 0.3s ease;
+} */

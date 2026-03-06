@@ -1,0 +1,81 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap');
+.dashboard-head h2{
+    letter-spacing: 3px;
+    margin-block: 20px;
+    text-align: center;
+    font-family: 'Poppins', var(--fontFamily), sans-serif;
+}
+
+.dashboard-head h2 span{
+    color: var(--btnBg);
+    font-style: italic;
+}
+
+
+.dashboard-forecast-cards{
+    margin-block: 50px;
+    display: grid;
+    gap: 20px;
+    @media(width>850px){
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+.dashboard-forecast-cards div{
+    display: block;
+    background-color: var(--cardBg);
+    border-radius: 20px;
+    padding: 30px;
+    font-size: 1.4rem;
+    box-shadow: 1px 1px 10px;
+    position: relative;
+    transition: all ease-in .4s;
+}
+
+.dashboard-forecast-cards div p{
+    font-weight: 550;
+    font-family: 'Poppins';
+    letter-spacing: 2px;
+    text-align: center;
+}
+.dashboard-forecast-cards div::before{
+    position:absolute;
+    content: '';
+    height: 5px;
+    width: 0%;
+    border-radius: 10px;
+    background-color: var(--btnBg);
+    bottom: -10px;
+    transition: all ease-in .4s;
+}
+
+.dashboard-forecast-cards div:hover::before{
+    width: 60%;
+}
+
+.dashboard-forecast-cards div:hover{
+    cursor: pointer;
+    transform: translateX(10px);
+    @media(width>850px){
+        transform: translateY(-10px);
+    }
+}
+
+.dashboard-forecast-cards div h4{
+    font-size: 1.5rem;
+    text-align: center;
+}
+
+.dashboard-forecast-cards div span{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding: 10px;
+    margin-block: 10px;
+}
+
+.dashboard-forecast-cards div span svg{
+    width: 35px;
+}
+

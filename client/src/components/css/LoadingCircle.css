@@ -1,0 +1,9 @@
+.saving-user-details{
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.saving{
+    background-color: var(--success);
+}

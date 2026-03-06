@@ -1,0 +1,13 @@
+.header-user-profile{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.header-user-profile img{
+    width: 40px;
+    border-radius: 100%;
+}
+.user-username{
+    font-weight: 600;
+    letter-spacing: 1px;    
+}

@@ -1,6 +1,3 @@
-# Generated .gitignore file for: Python, JavaScript, React, Vue, Flask, VSCode, Linux, Windows, macOS, npm, Pip, Yarn, Vite, PostgreSQL, SQLite, MySQL, JSON, GitHub Actions
-# Created with FOSSA's DevOps Tools
-
 # Python
 __pycache__/
 *.py[cod]

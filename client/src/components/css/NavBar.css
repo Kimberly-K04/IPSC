@@ -1,0 +1,42 @@
+/* .main-nav{
+    padding: 20px;
+} */
+
+.tabs{
+    background-color: var(--tabsBg);
+    padding-block: 30px;
+    padding-inline: 20px;
+    max-inline-size: 300px;
+    height: 100vmax;
+    box-shadow: 1px 1px 10px var(--hover);
+}
+
+.tabs li{
+    list-style: none;
+    margin-top: 50px;
+    font-size: 1.8rem;
+    background-color: inherit;
+}
+
+.nav-button{
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    border-radius: 12px;
+    text-decoration: none;
+    transition: ease-in all .3s;
+}
+
+.nav-button:hover,
+.nav-button.active,
+.nav-button:focus{
+    color: var(--hover);
+    border-left:5px solid var(--hover);
+    background-color: var(--mainBg);
+}
+
+.nav-button.active{
+    font-weight: 550;
+    box-shadow: 1px 1px 8px var(--color);
+}
