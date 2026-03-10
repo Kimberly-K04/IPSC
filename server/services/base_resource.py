@@ -1,5 +1,5 @@
-from flask_restful import Resource
-from flask import make_response,abort,request,session
+from flask_restful import Resource,abort
+from flask import make_response,request,session
 from ..config import db
 
 class Login(Resource):
@@ -22,7 +22,7 @@ class Login(Resource):
         user=self.Model.query.filter_by(email=email).first()
         
         if not user or not user.authenticate(password):
-            return {'Invalid password or email'},401
+            return {'error':'Invalid password or email'},401
         
         session['user_id']=user.id
         return user.to_dict(),200
@@ -61,7 +61,7 @@ class AllResource(Resource):
             abort(401,message='Authentication required')
     
     def get(self):
-        self.authenticate()
+        # self.authenticate()
         per_page=int(request.args.get('per_page', 10))
         page=int(request.args.get('page',1))
         try:
@@ -93,7 +93,11 @@ class SingleResource(Resource):
         self.Model=model
         self.resource_items=resource_items
         self.rules=rules
-        
+    
+    def authenticate(self):
+        if not session.get('user_id'):
+            abort(401,message='Authentication required')
+    
     def get(self,id):
         self.authenticate()
         
@@ -127,7 +131,6 @@ class SingleResource(Resource):
     
     def delete(self,id):
         self.authenticate()
-        
         item=self.Model.query.filter_by(id=id).first()
         
         if not item:

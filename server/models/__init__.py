@@ -5,4 +5,4 @@ from .sale import Sale
 from .product import Product
 from .supplier import Supplier
 
-# __all__=['User', ]
+__all__=['User', 'Alert', 'Order', 'Sale', 'Product', 'Supplier']
