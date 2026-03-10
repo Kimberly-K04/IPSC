@@ -1,0 +1,70 @@
+.login-page{
+    margin-top: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    letter-spacing: 3px;
+}
+
+
+.login-page img{
+    max-inline-size: 90px;
+    margin: 0 auto;
+}
+
+.login-page h4{
+    margin-top: 20px;
+}
+
+.sign-in-form{
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+}
+.sign-in-form label{
+    display: flex;
+    justify-content: center;
+    align-items: baseline;
+    gap: 10px;
+}
+
+.sign-in-form input{
+    padding: 10px;
+    margin-top: 20px;
+    border-radius: 15px;
+    font-size: 1.3rem;
+    inline-size: 100%;
+}
+
+.sign-in-form button{
+    margin-block: 30px;
+    background-color: var(--btnBg);
+    cursor: pointer;
+    color: var(--btnText);
+}
+
+.sign-in-form button:hover{
+    background-color: var(--hover);
+}
+
+.password-field{
+    position: relative;
+}
+
+.toggle-password{
+    position: absolute;
+    right: -9px;
+    border-radius: 15px;
+    top: 20%;
+    transform:  translateY(-50%);
+    background: none;
+    cursor: pointer;
+}
+
+
+.error{
+    color: red;
+    margin-top: 20px;
+}

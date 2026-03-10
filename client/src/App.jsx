@@ -6,47 +6,70 @@ import Header from './components/Header'
 import {useState, useEffect} from 'react'
 import SkeletomComp from './components/SkeletomComp'
 import FetchError from './components/FetchError'
+import Login from './pages/Login/Login'
 
 function App() {
   const [products, setProducts] = useState([])
-  const [users, setUsers] = useState([])
+  const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
   const [sending, setSending] = useState(false)
 
-  // If env variable is missing, default to localhost:8000
-const APIBaseurl ="http://localhost:4000"
 
   useEffect(()=>{
-
-    async function handlefetch(url, setterFunc){
+    async function autoLogin(){
       try{
-        const r  = await fetch(`${APIBaseurl}/${url}`)
+        const r = await fetch('/check_session')
+        
+        if (!r.ok){
+        throw new Error('Not Authenticated')}
+        
+        const user= await r.json()
+        setUser(user)
 
-        if(!r.ok){
-          throw new Error(`Error status: ${r.status}`)
-        }
-        const data = await r.json()
-        // console.log(`Data received: ${url}`, data)
-        setterFunc(data)
-      }catch(error){
-        // console.error(error)
-        setError(error.message)
-      }
+        const resProducts=await fetch('/products')
+        const productData= await resProducts.json()
+        setProducts(productData)
+        setLoading(false)
+      }catch((err)=>{
+        console.log(err)
+        setLoading(false)
+      })
     }
+  },[])
+
+
+  // useEffect(()=>{
+
+  //   async function handlefetch(url, setterFunc){
+  //     try{
+  //       const r  = await fetch(`${APIBaseurl}/${url}`)
+
+  //       if(!r.ok){
+  //         throw new Error(`Error status: ${r.status}`)
+  //       }
+  //       const data = await r.json()
+  //       // console.log(`Data received: ${url}`, data)
+  //       setterFunc(data)
+  //     }catch(error){
+  //       // console.error(error)
+  //       setError(error.message)
+  //     }
+  //   }
 
     // when all promise are resolved
-    Promise.all([
-      handlefetch('users', setUsers),
-      handlefetch('products', setProducts)
-    ])
-      .then(()=>{setLoading(true)})
-      .catch(()=>{setLoading(true)}) // show page even when it has error
+  //   Promise.all([
+  //     handlefetch('users', setUsers),
+  //     handlefetch('products', setProducts)
+  //   ])
+  //     .then(()=>{setLoading(true)})
+  //     .catch(()=>{setLoading(true)}) // show page even when it has error
 
-  }, [APIBaseurl])
+  // }, [APIBaseurl])
 
   // console.table(users)
   // console.table(products)
+
 
   async function handleProfileEdit(e, formObj){
     e.preventDefault()
@@ -73,9 +96,12 @@ const APIBaseurl ="http://localhost:4000"
     }
   }
 
+  if(!user) return <Login onLogin={setUser}/>
+
   return (
     <>
-    {loading?<main>
+    {loading
+    ?<main>
       <Header users={users}/>
       <section className='main-wrapper'>
         <aside><NavBar/></aside>
@@ -89,7 +115,8 @@ const APIBaseurl ="http://localhost:4000"
           }}/>
         }
       </section>
-    </main>:<SkeletomComp/>}
+    </main>
+    :<SkeletomComp/>}
     </>
   )
 }
