@@ -27,15 +27,3 @@
     color: var(--error);
 }
 
-.fetch-error p a{
-    font-weight: 550;
-    text-decoration: none;
-    color: var(--hover);
-    font-size: 1.5rem;
-    transition: .3s all ease-in;
-}
-
-.fetch-error p a:hover{
-    color: var(--success);
-}
-

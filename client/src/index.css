@@ -90,6 +90,19 @@ body.darkmode svg {
     transition: fill 0.3s ease-in-out;
 }
 
+a{
+    font-weight: 550;
+    text-decoration: none;
+    color: var(--hover);
+    font-size: 1.5rem;
+    transition: .3s all ease-in;
+}
+
+a:hover{
+    color: var(--success);
+}
+
+
 .main-wrapper{
     display: flex;
     gap: 20px;

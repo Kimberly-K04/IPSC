@@ -6,6 +6,7 @@ import Alerts from './pages/Alerts/Alerts'
 import Forecast from './pages/Forecast/Forecast'
 import Analytics from './pages/Analytics/Analytics'
 import ErrorPage from './pages/ErrorPage/ErrorPage'
+import Login from './pages/Login/Login'
 
 const routes = [
     {
@@ -13,6 +14,10 @@ const routes = [
         element:<App/>,
         errorElement:<ErrorPage/>,
         children:[
+            {
+                path:'/login',
+                element:<Login/>
+            },
             {
                 path:"/",
                 element:<Dashboard/>

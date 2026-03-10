@@ -14,6 +14,7 @@ app=create_app()
 with app.app_context():
 
     User.query.delete()
+    print('Delete Existing data')
     
     user=User(
         fullname='Jack Snow',
