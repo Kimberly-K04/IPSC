@@ -6,45 +6,39 @@
   
 ![erd_diagram](./dbdiagram.io.png)
 
-## Structure
+## File Structure
 
 ```bash
 ├── client
 │   ├── db.json
 │   ├── eslint.config.js
 │   ├── index.html
+│   ├── node_modules
 │   ├── package.json
 │   ├── pnpm-lock.yaml
 │   ├── public
 │   ├── README.md
 │   ├── src
-│   │   ├── App.css
-│   │   ├── App.jsx
-│   │   ├── assets
-│   │   ├── components
-│   │   ├── designs
-│   │   ├── index.css
-│   │   ├── main.jsx
-│   │   ├── pages
-│   │   └── routes.jsx
+│   └── vite.config.js
 ├── dbdiagram.io.png
-├── instance
+├── ipsc.dbml
 ├── migrations
+│   ├── alembic.ini
+│   ├── env.py
+│   ├── __pycache__
+│   ├── README
+│   ├── script.py.mako
+│   └── versions
 ├── README.md
 ├── requirements.txt
 └── server
-    ├── app.py
-    ├── models
-    │   ├── alert.py
-    │   ├── dbconn.py
-    │   ├── order.py
-    │   ├── product.py
-    │   ├── sale.py
-    │   ├── supplier.py
-    │   └── user.py
-    └── routes
-    └── seed.py
-    └── services
+├── app.py
+├── config.py
+├── models
+├── __pycache__
+├── routes
+├── seed.py
+└── services
 
 ```
 
@@ -57,8 +51,6 @@ python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 ```
-
-- No need to run ```flask db init``` already done for you
 
 ### Enviroment Variables
 
@@ -89,6 +81,8 @@ sudo -u postgres psql -c "ALTER USER postgres WITH PASSWORD 'postgres';"
 ```
 
 **5. Add migration commands to create the tables**
+
+- No need to run ```flask db init``` already done for you
 
 - After setting up the database and installing dependencies, run the following to create all tables:
 

@@ -1,6 +1,53 @@
 from flask_restful import Resource
-from flask import make_response,abort,request
+from flask import make_response,abort,request,session
 from ..config import db
+
+class Login(Resource):
+    def __init__(self,model):
+        super().__init__()
+        self.Model=model
+    
+    def post(self):
+        data=request.get_json()
+        
+        if not data:
+            return {'error':'No input'},400
+        
+        email=data.get('email')
+        password=data.get('password')
+        
+        if not email or not password:
+            return {'error':'Password and email Required'},400
+        
+        user=self.Model.query.filter_by(email=email).first()
+        
+        if not user or not user.authenticate(password):
+            return {'Invalid password or email'},401
+        
+        session['user_id']=user.id
+        return user.to_dict(),200
+
+class CheckSession(Resource):
+    def __init__(self,model):
+        super().__init__()
+        self.Model=model
+        
+    def get(self):
+        user=self.Model.query.filter(self.Model.id==session.get('user_id')).first()
+        
+        if user:
+            return user.to_dict(),200
+        return {'message':'401 Not Authorized'},401
+
+class Logout(Resource):
+    def __init__(self,model):
+        super().__init__()
+        self.Model=model
+        
+    def delete(self):
+        session.pop('user_id',None)
+        return {},204
+
 
 class AllResource(Resource):
     def __init__(self, model, resource_items='items', rules=[]):
@@ -9,7 +56,12 @@ class AllResource(Resource):
         self.resource_items=resource_items
         self.rules=rules
     
+    def authenticate(self):
+        if not session.get('user_id'):
+            abort(401,message='Authentication required')
+    
     def get(self):
+        self.authenticate()
         per_page=int(request.args.get('per_page', 10))
         page=int(request.args.get('page',1))
         try:
@@ -22,6 +74,8 @@ class AllResource(Resource):
             return {'errors':[str(e)]}
     
     def post(self):
+        self.authenticate()
+        
         item=self.Model()
         try:
             for field, value in request.json.items():
@@ -41,6 +95,8 @@ class SingleResource(Resource):
         self.rules=rules
         
     def get(self,id):
+        self.authenticate()
+        
         item=self.Model.query.filter_by(id=id).first()
         
         if not item:
@@ -50,6 +106,8 @@ class SingleResource(Resource):
     
     
     def patch(self,id):
+        self.authenticate()
+        
         item=self.Model.query.filter_by(id=id).first()
         
         if not item:
@@ -68,6 +126,8 @@ class SingleResource(Resource):
             return {'errors':[str(e)]}, 400
     
     def delete(self,id):
+        self.authenticate()
+        
         item=self.Model.query.filter_by(id=id).first()
         
         if not item:
@@ -76,3 +136,4 @@ class SingleResource(Resource):
         db.session.delete(item)
         db.session.commit()
         return make_response({}, 204)
+    

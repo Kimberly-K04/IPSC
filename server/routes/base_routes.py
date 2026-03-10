@@ -1,6 +1,16 @@
 from ..models import *
 from .helper_routes import create_routes
 
+# #--------Login------
+# create_routes('/login',User)
+
+# #--------CheckSession-----
+# create_routes('/check_session', User)
+
+# #---------Logout-------
+# create_routes('/logout',User)
+
+
 # ------User-------
 create_routes('/users', User, 'User')
 

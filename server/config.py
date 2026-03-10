@@ -16,6 +16,7 @@ bcrypt=Bcrypt()
 
 def config_app(app):
     app.config.from_prefixed_env()
+    app.json.compact=False
     db.init_app(app)
     bcrypt.init_app(app)
     migrate.init_app(app,db)

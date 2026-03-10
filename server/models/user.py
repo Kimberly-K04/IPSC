@@ -31,6 +31,12 @@ class User(db.Model, SerializerMixin):
             return email
         raise ValueError('Email needs to be present and of the correct format')
     
+    @validates('role')
+    def validate_role(self,key,role):
+        if role and isinstance(role,str):
+            return role
+        raise ValueError("Role needs to be present and a string. Default role is 'staff'.")
+    
     @validates('_password_hash')
     def validate_password(self,key,password):
         if password and len(password)>=8:
