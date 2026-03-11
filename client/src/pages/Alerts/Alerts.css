@@ -95,6 +95,40 @@
   align-items: center;
   gap: 8px;
 }
+.alert-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+  justify-content: flex-end; 
+}
+
+.alert-actions button {
+  padding: 7px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--color);
+  background: var(--tabBg);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: 0.2s;
+  flex: 1; 
+}
+
+.alert-actions button:hover {
+  background: var(--hover);
+  border-color: #888;
+}
+.alert-actions button.delete {
+  background: #ffe6e6;        
+  border-color: #ff4d4d;     
+  color: #cc0000;             
+}
+
+.alert-actions button.delete:hover {
+  background: #ffcccc;       
+  border-color: #cc0000;
+  color: #800000;             
+}
 
 .product-name {
   font-size: 13px;

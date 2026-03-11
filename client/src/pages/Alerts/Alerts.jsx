@@ -9,21 +9,24 @@ function Alerts() {
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
 
-  const {products} = useOutletContext()
+  const { products } = useOutletContext();
 
   useEffect(() => {
     async function fetchAlerts() {
       try {
+        const res = await fetch('/alerts');
+        if (!res.ok) throw new Error('Failed to fetch alerts');
 
-        const allAlerts = products.flatMap(product =>
-          (product.alerts || []).map(alert => ({
+        const data = await res.json();
+        const alertsWithNames = data.data.map(alert => {
+          const product = products.find(p => p.id === alert.product_id);
+          return {
             ...alert,
-            product_name: product.name,
-            status: alert.status || 'unread'
-          }))
-        );
+            product_name: product ? product.name : null,
+          };
+        });
 
-        setAlerts(allAlerts);
+        setAlerts(alertsWithNames);
         setLoading(false);
       } catch (err) {
         console.error(err);
@@ -32,12 +35,36 @@ function Alerts() {
     }
 
     fetchAlerts();
-  }, []);
+  }, [products]);
 
-  const acknowledgeAlert = (id) => {
-    setAlerts(prev =>
-      prev.map(a => (a.id === id ? { ...a, status: 'read' } : a))
-    );
+  const acknowledgeAlert = async (id) => {
+    try {
+      const res = await fetch(`/alerts/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'read' }),
+      });
+
+      if (!res.ok) throw new Error('Failed to update alert');
+
+      const updatedAlert = await res.json();
+      setAlerts(prev =>
+        prev.map(a => (a.id === updatedAlert.data.id ? { ...a, status: 'read' } : a))
+      );
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const deleteAlert = async (id) => {
+    try {
+      const res = await fetch(`/alerts/${id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error('Failed to delete alert');
+
+      setAlerts(prev => prev.filter(a => a.id !== id));
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const sortedAlerts = [...alerts].sort((a, b) => (a.status === 'read') - (b.status === 'read'));
@@ -87,8 +114,8 @@ function Alerts() {
         {filteredAlerts.length === 0 && <p>No alerts found.</p>}
         {filteredAlerts.map(alert => (
           <div
-            key={alert.id} 
-            className={`alert-card ${alert.type} ${alert.status === 'read' ? 'acknowledged fade-out' : ''}`}
+            key={alert.id}
+            className={`alert-card ${alert.type || ''} ${alert.status === 'read' ? 'acknowledged fade-out' : ''}`}
           >
             <div className="alert-top">
               <h3>
@@ -98,11 +125,12 @@ function Alerts() {
               {alert.product_name && <span className="product-name">({alert.product_name})</span>}
             </div>
             <p className="time">{alert.created_at ? new Date(alert.created_at).toLocaleString() : ''}</p>
-            {alert.status !== 'read' && (
-              <div className="alert-actions">
+            <div className="alert-actions">
+              {alert.status !== 'read' && (
                 <button onClick={() => acknowledgeAlert(alert.id)}>Acknowledge</button>
-              </div>
-            )}
+              )}
+          <button className="delete" onClick={() => deleteAlert(alert.id)}>Delete</button>            
+          </div>
           </div>
         ))}
       </div>
