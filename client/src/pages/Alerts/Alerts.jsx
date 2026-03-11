@@ -129,8 +129,8 @@ function Alerts() {
               {alert.status !== 'read' && (
                 <button onClick={() => acknowledgeAlert(alert.id)}>Acknowledge</button>
               )}
-              <button onClick={() => deleteAlert(alert.id)}>Delete</button>
-            </div>
+          <button className="delete" onClick={() => deleteAlert(alert.id)}>Delete</button>            
+          </div>
           </div>
         ))}
       </div>
