@@ -1,6 +1,6 @@
 import './App.css'
 import NavBar from './components/NavBar'
-import { Outlet} from 'react-router-dom'
+import { Outlet, useNavigate} from 'react-router-dom'
 import './index.css'
 import Header from './components/Header'
 import {useState, useEffect} from 'react'
@@ -9,6 +9,9 @@ import FetchError from './components/FetchError'
 import Login from './pages/Login/Login'
 
 function App() {
+
+  const navigate=useNavigate()
+
   const [products, setProducts] = useState([])
   const [user, setUser] = useState(null)
   const [suppliers, setSuppliers]=useState([])
@@ -25,21 +28,21 @@ function App() {
     async function loadData() {
       try{
         const checkSessionRes=await fetch('/api/check_session')
-        if(!checkSessionRes) throw new Error('Not Authenticated')
+        if(!checkSessionRes.ok) throw new Error('Not Authenticated')
         
           const userData=await checkSessionRes.json()
           setUser(userData)
 
-          const [productsRes,suppliersRes, ordersRes,salesRes,alertsRes]=await Promise.all([
+          const [productsRes,suppliersRes, ordersRes,salesRes,alertsRes]=await Promise.allSettled([
             fetch('/api/products'),
             fetch('/api/suppliers'),
-            fetch('/api/orders'),
-            fetch('/api/sales'),
+            fetch('/api/users/me/orders'), // user specific data
+            fetch('/api/users/me/sales'),
             fetch('/api/alerts')
           ])
 
           const extractData=async(result)=>{
-            if(result.value.ok){
+            if(result.value.ok&&result.status==='fulfilled'){
               const json=await result.value.json()
               return json.data||[]
             }
@@ -55,24 +58,19 @@ function App() {
       }
       catch(err){
         if(err.message=='Not Authenticated'){
-          return
+          setUser(null)
+          setLoading(false)
         }else{
           setError(err.message)
+          setLoading(false)
         }
       }
       finally{
         setLoading(false)
       }
     }
-  
-    fetch('/api/check_session')
-      .then(r=>{
-        if (!r.ok) throw new Error('Not Authenticated')
-        return r.json()  //get user 
-        
-      })
       
-      loadData()
+    loadData()
     
   },[])
 
@@ -104,6 +102,26 @@ function App() {
     }
   }
 
+  async function handleLogOut(){
+    const configObj={
+      method:'DELETE',
+      headers:{'Content-Type':'application/json'}
+    }
+    try{
+      const r = await fetch('/api/logout', configObj)
+      if (!r.ok) throw new Error('Failed to LogOut')
+        setUser(null)
+        setAlerts([])
+        setOrders([])
+        setProducts([])
+        setSuppliers([])
+        setSales([])
+        navigate('/login')
+    }catch(err){
+      setError(err.message)
+    }
+  }
+
   if (loading) return <SkeletomComp/>
 
   if(!user) return <Login onLogin={setUser}/>
@@ -124,6 +142,7 @@ function App() {
             suppliers:suppliers,
             alerts:alerts,
             onProfileEdit:handleProfileEdit,
+            onLogOut:handleLogOut,
             sending:sending
           }}/>
         }

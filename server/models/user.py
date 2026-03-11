@@ -38,12 +38,6 @@ class User(db.Model, SerializerMixin):
             return role
         raise ValueError("Role needs to be present and a string. Default role is 'staff'.")
     
-    @validates('_password_hash')
-    def validate_password(self,key,password):
-        if password and len(password)>=8:
-            return password
-        raise ValueError('Password needs to be present and have at least 8 characters long')
-    
     
     def __repr__(self):
         return f'<User id:{self.id}, name:{self.fullname}, email:{self.email}'
@@ -54,9 +48,15 @@ class User(db.Model, SerializerMixin):
     
     @password_hash.setter
     def password_hash(self,password):
+        if not password and len(password)<8:
+            raise ValueError('Password needs to be present and have at least 8 characters long')
+        
         password_hash=bcrypt.generate_password_hash(
-            password.encode('utf-8'))
+            password.encode('utf-8')
+        )
+        
         self._password_hash=password_hash.decode('utf-8')
+        
         
     def authenticate(self, password):
         return bcrypt.check_password_hash(self._password_hash, password.encode('utf-8'))

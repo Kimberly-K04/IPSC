@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import './SettingsPage.css';
+import { FaEject } from 'react-icons/fa';
 import LoadingCircle from '../../components/LoadingCircle';
 
 function SettingsPage() {
   // Get users from Outlet context
-  const { user, onProfileEdit, sending } = useOutletContext();
+  const { user, onProfileEdit, sending, onLogOut } = useOutletContext();
 
   // Active tab
   const [activeTab, setActiveTab] = useState("profile");
@@ -69,6 +70,7 @@ function SettingsPage() {
     alert("Security saved!");
   };
 
+
   return (
     <div className="settings-page">
       {/* Tabs */}
@@ -80,9 +82,9 @@ function SettingsPage() {
             onClick={() => setActiveTab(tab)}
           >
             {tab === "profile" ? "Profile" :
-             tab === "security" ? "Account Security" :
-             tab === "notifications" ? "Notifications" :
-             "Appearance"}
+              tab === "security" ? "Account Security" :
+              tab === "notifications" ? "Notifications" :
+              "Appearance"}
           </button>
         ))}
       </div>
@@ -90,23 +92,26 @@ function SettingsPage() {
       <div className="settings-card">
         {/* Profile */}
         {activeTab === "profile" && (
-          <div className="content">
-            <h3>Profile Section</h3>
-            <img className="avatar" src={profilePic} alt='profile image'/>
+          <section>
+            <div className="content">
+              <h3>Profile Section</h3>
+              <img className="avatar" src={profilePic} alt='profile image'/>
 
-            <form onSubmit={(e)=>onProfileEdit(e, formObj)} className='profile-form'>
-              <label>Name</label>
-              <input name='name' value={formObj.name} onChange={handleChange} placeholder="Enter your name" />
+              <form onSubmit={(e)=>onProfileEdit(e, formObj)} className='profile-form'>
+                <label>Name</label>
+                <input name='name' value={formObj.name} onChange={handleChange} placeholder="Enter your name" />
 
-              <label>Email</label>
-              <input name='email' value={formObj.email} onChange={handleChange} placeholder="Enter your email" />
+                <label>Email</label>
+                <input name='email' value={formObj.email} onChange={handleChange} placeholder="Enter your email" />
 
-              <button className={!sending?'save-btn':"saving"}>{!sending?'Save Changes'
-                  :
-                  <LoadingCircle/>
-              }</button>
-            </form>
-          </div>
+                <button className={!sending?'save-btn':"saving"}>{!sending?'Save Changes'
+                    :
+                    <LoadingCircle/>
+                }</button>
+              </form>
+            </div>
+            <button type='button' onClick={onLogOut} className='log-out'>Log Out<FaEject/></button>
+          </section>
         )}
 
         {/* Security */}

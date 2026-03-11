@@ -1,6 +1,7 @@
 from flask_restful import Resource,abort
 from flask import make_response,request,session
 from ..config import db
+from ..models import    Sale,Order
 
 class Login(Resource):
     def __init__(self,model):
@@ -61,7 +62,7 @@ class AllResource(Resource):
             abort(401,message='Authentication required')
     
     def get(self):
-        # self.authenticate()
+        self.authenticate()
         per_page=int(request.args.get('per_page', 10))
         page=int(request.args.get('page',1))
         try:
@@ -85,6 +86,34 @@ class AllResource(Resource):
             return make_response({'data':item.to_dict(rules=self.rules)}, 201)
         except Exception as e:
             return {'errors':[str(e)]},400
+
+
+class UserOrders(AllResource):
+    def get(self):
+        self.authenticate()
+        query=self.Model.query.filter(self.Model.user_id==session.get('user_id'))
+        per_page=int(request.args.get('per_page', 10))
+        page=int(request.args.get('page',1))
+        try:
+            query=self.Model.query.limit(per_page).offset((page-1)*per_page)
+            total_count=self.Model.query.count()
+            
+            items_dict=[i.to_dict() for i in query.all()]
+            return make_response({'data':items_dict, 'total':total_count},200)
+        except Exception as e:
+            return {'errors':[str(e)]}
+
+class UserSales(Resource):
+    def authenticate(self):
+        if not session.get('user_id'):
+            abort(401,message='Authentication required')
+    
+    
+    def get(self):
+        self.authenticate()
+        sales=Sale.query.join(Order).filter(Order.user_id==session['user_id']).all()
+        sales_dict=[s.to_dict() for s in sales]
+        return make_response({'data':sales_dict},200)
 
 
 class SingleResource(Resource):

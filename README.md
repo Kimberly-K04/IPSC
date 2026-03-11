@@ -106,4 +106,7 @@ FLASK_APP=server.app
 FLASK_RUN_PORT=5020
 FLASK_DEBUG=True
 FLASK_SQLALCHEMY_DATABASE_URI=postgresql://postgres:postgres@localhost:5432/ipsc_db #for development
+FLASK_SQLALCHEMY_TRACK_MODIFICATIONS=False
+FLASK_SECRET_KEY=your-secret-key
+FLASK_SESSION_PERMANENT=False
 ```
