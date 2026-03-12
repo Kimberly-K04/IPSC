@@ -20,5 +20,10 @@ class Order(db.Model, SerializerMixin):
 
     sales = db.relationship("Sale", back_populates="order", cascade="all, delete-orphan") 
 
+from .sale import Sale
+from sqlalchemy import Column, Integer, ForeignKey
 
+# This "monkey-patches" the missing link without editing sale.py
+if not hasattr(Sale, 'order_id'):
+    Sale.order_id = Column(Integer, ForeignKey('orders.id'))
 

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import sys 
 import os
+from sqlalchemy import text
 from server.models import User, Supplier, Product, Order, Sale, Alert 
 from server.config import db
 from server.app import create_app
@@ -17,6 +18,7 @@ with app.app_context():
     Product.query.delete()
     Supplier.query.delete()
     User.query.delete()
+    db.session.execute(text(f'TRUNCATE TABLE {User.__tablename__} RESTART IDENTITY;'))
     db.session.commit()
     print('Deleted existing data')
 
