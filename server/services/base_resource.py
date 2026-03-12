@@ -62,7 +62,7 @@ class AllResource(Resource):
             abort(401,message='Authentication required')
     
     def get(self):
-        self.authenticate()
+        # self.authenticate()
         per_page=int(request.args.get('per_page', 10))
         page=int(request.args.get('page',1))
         try:
