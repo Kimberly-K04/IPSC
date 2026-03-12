@@ -52,7 +52,6 @@ with app.app_context():
     ]
     for a in alerts:
         db.session.add(a)
-    
 
     db.session.commit()
     print("Database seeded with Users, Products, and Alerts!")
