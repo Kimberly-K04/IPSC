@@ -36,7 +36,7 @@ with app.app_context():
     print("Seeding Users...")
     users = []
 
-    # Fixed users for easy login
+    # Fixed users
     fixed_users = [
         {"fullname": "Alice Johnson", "email": "alice@ipsc.com", "role": "admin"},
         {"fullname": "Bob Smith", "email": "bob@ipsc.com", "role": "staff"},
@@ -53,7 +53,7 @@ with app.app_context():
         db.session.add(u)
         users.append(u)
 
-    # Random users
+    # Random
     for _ in range(NUM_RANDOM_USERS):
         u = User(
             fullname=fake.name(),
@@ -70,7 +70,7 @@ with app.app_context():
     for u in users:
         print(f"{u.fullname} | {u.email} | password: 12345")
 
-    # Seed Suppliers
+    # Suppliers
     suppliers = []
     for _ in range(NUM_SUPPLIERS):
         s = Supplier(
@@ -81,7 +81,7 @@ with app.app_context():
         suppliers.append(s)
     db.session.flush()
 
-    # Seed Products
+    # Products
     products = []
     for _ in range(NUM_PRODUCTS):
         product = Product(
@@ -94,7 +94,7 @@ with app.app_context():
         products.append(product)
     db.session.flush()
 
-    # Seed Orders
+    # Orders
     orders = []
     for _ in range(NUM_ORDERS):
         o = Order(
@@ -106,7 +106,7 @@ with app.app_context():
         orders.append(o)
     db.session.flush()
 
-    # Seed Sales
+    # Sales
     for _ in range(NUM_SALES):
         product = random.choice(products)
         quantity = random.randint(1, 5)
