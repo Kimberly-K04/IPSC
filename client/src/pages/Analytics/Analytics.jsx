@@ -1,3 +1,4 @@
+// src/pages/Analytics/Analytics.jsx
 import React, { useEffect, useState } from "react";
 import {
   LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer,
@@ -5,7 +6,8 @@ import {
 } from "recharts";
 import { FaDollarSign, FaUser, FaChartLine, FaBox } from "react-icons/fa";
 import { useOutletContext } from "react-router-dom";
-import './Analytics.css';
+import SalesOrdersPanel from "../../components/SalesOrdersPanel";
+import "./Analytics.css";
 
 const colors = ["#3B82F6", "#10B981", "#F59E0B", "#EF4444", "#6366F1"];
 
@@ -24,51 +26,49 @@ function KPICard({ title, value, icon, chart }) {
   );
 }
 
-function Analytics() {
-  const [monthlyRevenue, setMonthlyRevenue] = useState([]);
-  const [topProducts, setTopProducts] = useState([]);
-  const [customerGrowth, setCustomerGrowth] = useState([]);
-  const [salesByCategory, setSalesByCategory] = useState([]);
+export default function Analytics() {
+  const { products, orders, sales } = useOutletContext();
 
-  const { products } = useOutletContext();
+  // Prepare chart data
+  const monthlyRevenue = [];
+  const customerGrowth = [];
+  const topProducts = [];
+  const salesByCategory = [];
 
-  useEffect(() => {
-    if (!products || products.length === 0) return;
+  // Simple aggregation logic
+  const monthlyTotals = {};
+  const categoryTotals = {};
+  const productRevenue = {};
 
-    const monthlyRevenueTotals = {};
-    const customerGrowthData = {};
-    const categoryTotals = {};
-    const productsRevenue = products.map((p) => {
-      const totalRevenue = p.sales.reduce((sum, s) => sum + s.unitsSold * p.price, 0);
-      categoryTotals[p.category] = (categoryTotals[p.category] || 0) + totalRevenue;
+  sales.forEach(sale => {
+    // Monthly revenue
+    const month = new Date(sale.order_date || sale.created_at).toISOString().substring(0,7);
+    monthlyTotals[month] = (monthlyTotals[month] || 0) + Number(sale.total_price);
 
-      p.sales.forEach((s) => {
-        const month = s.date.substring(0, 7);
-        monthlyRevenueTotals[month] = (monthlyRevenueTotals[month] || 0) + totalRevenue;
-        customerGrowthData[month] = (customerGrowthData[month] || 0) + 1;
-      });
+    // Customer growth (count sales as proxy)
+    customerGrowth.push({ month, customers: (monthlyTotals[month] || 0) + 1 });
 
-      return { name: p.name, revenue: totalRevenue };
-    });
+    // Product revenue
+    productRevenue[sale.product_id] = (productRevenue[sale.product_id] || 0) + Number(sale.total_price);
 
-    setMonthlyRevenue(
-      Object.keys(monthlyRevenueTotals).map((m) => ({ month: m, revenue: monthlyRevenueTotals[m] }))
-    );
-    setTopProducts(productsRevenue.sort((a,b)=>b.revenue - a.revenue).slice(0,5));
-    setCustomerGrowth(
-      Object.keys(customerGrowthData).map((m)=>({ month: m, customers: customerGrowthData[m] }))
-    );
-    setSalesByCategory(
-      Object.keys(categoryTotals).map((c)=>({ category: c, sales: categoryTotals[c] }))
-    );
-  }, [products]);
+    // Category totals
+    const prod = products.find(p => p.id === sale.product_id);
+    if(prod) categoryTotals[prod.category] = (categoryTotals[prod.category] || 0) + Number(sale.total_price);
+  });
 
-  const totalRevenue = monthlyRevenue.reduce((sum, m) => sum + m.revenue, 0);
-  const totalCustomers = customerGrowth.reduce((sum, c) => sum + c.customers, 0);
-  const topProduct = topProducts[0]?.name || "-";
+  // Prepare arrays for charts
+  Object.keys(monthlyTotals).sort().forEach(m => monthlyRevenue.push({ month: m, revenue: monthlyTotals[m] }));
+  Object.keys(productRevenue).sort().forEach(pid => {
+    const prod = products.find(p => p.id === Number(pid));
+    if(prod) topProducts.push({ name: prod.name, revenue: productRevenue[pid] });
+  });
+  topProducts.sort((a,b)=>b.revenue - a.revenue);
+  Object.keys(categoryTotals).forEach(cat => salesByCategory.push({ category: cat, sales: categoryTotals[cat] }));
 
-  const textColor = getComputedStyle(document.documentElement).getPropertyValue('--textColor').trim();
-  const cardBg = getComputedStyle(document.documentElement).getPropertyValue('--cardBg').trim();
+  // Text colors from CSS variables
+  const rootStyles = getComputedStyle(document.documentElement);
+  const textColor = rootStyles.getPropertyValue("--textColor").trim();
+  const cardBg = rootStyles.getPropertyValue("--cardBg").trim();
 
   const chartsData = [
     {
@@ -85,7 +85,7 @@ function Analytics() {
     {
       title: "Top 5 Products by Revenue",
       chart: (
-        <BarChart data={topProducts}>
+        <BarChart data={topProducts.slice(0,5)}>
           <XAxis dataKey="name" stroke={textColor} />
           <YAxis stroke={textColor} />
           <Tooltip contentStyle={{ backgroundColor: cardBg, color: textColor }} labelStyle={{ color: textColor }} />
@@ -121,6 +121,11 @@ function Analytics() {
     }
   ];
 
+  // KPI values
+  const totalRevenue = sales.reduce((sum,s)=>sum + Number(s.total_price),0);
+  const totalCustomers = sales.length; // proxy
+  const topProduct = topProducts[0]?.name || "-";
+
   return (
     <div className="analytics-page">
       <h1>Sales & Performance Analytics</h1>
@@ -154,8 +159,9 @@ function Analytics() {
         <KPICard title="Categories Sold" value={salesByCategory.length} icon={<FaBox />} />
       </div>
 
+      {/* Charts grid */}
       <div className="charts-grid">
-        {chartsData.map((c, i) => (
+        {chartsData.map((c,i)=>(
           <div className="card" key={i}>
             <h3>{c.title}</h3>
             <div className="chart-card-container">
@@ -166,8 +172,9 @@ function Analytics() {
           </div>
         ))}
       </div>
+
+      {/* Sales & Orders Panel embedded */}
+      <SalesOrdersPanel />
     </div>
   );
 }
-
-export default Analytics;
