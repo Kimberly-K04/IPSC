@@ -1,0 +1,124 @@
+.sales-orders-panel {
+  margin-top: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  font-family: 'Inter', sans-serif;
+}
+
+.kpi-summary-grid {
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.order-card {
+  background-color: var(--cardBg);
+  border: 1px solid var(--borderColor);
+  border-radius: 12px;
+  padding: 15px;
+  flex: 1;
+  min-width: 150px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  transition: box-shadow 0.2s ease;
+}
+
+.order-card:hover {
+  box-shadow: 0 6px 18px var(--kpiHoverShadow);
+}
+
+.order-card h3 {
+  margin: 0 0 5px 0;
+  color: var(--textColor);
+}
+
+.order-card p {
+  margin: 0;
+  font-weight: 600;
+  color: var(--secondaryText);
+}
+
+.btn-add-order {
+  background-color: #3B82F6;
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  width: fit-content;
+  transition: background 0.2s ease;
+}
+
+.btn-add-order:hover {
+  background-color: #2563EB;
+}
+
+.new-order-form {
+  background-color: var(--cardBg);
+  border: 1px solid var(--borderColor);
+  border-radius: 12px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sale-row {
+  display: flex;
+  gap: 10px;
+}
+
+.sale-row select,
+.sale-row input {
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid var(--borderColor);
+  flex: 1;
+  background-color: var(--cardBg);
+  color: var(--textColor);
+}
+
+.btn-add {
+  background-color: #10B981;
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  width: fit-content;
+  margin-top: 5px;
+}
+
+.btn-add:hover {
+  background-color: #059669;
+}
+
+.sales-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.sales-table th,
+.sales-table td {
+  border-bottom: 1px solid var(--borderColor);
+  padding: 8px;
+  text-align: left;
+  color: var(--textColor);
+}
+
+.sales-table th {
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .sale-row {
+    flex-direction: column;
+  }
+  .kpi-summary-grid {
+    flex-direction: column;
+  }
+  .btn-add, .btn-add-order {
+    width: 100%;
+  }
+}
