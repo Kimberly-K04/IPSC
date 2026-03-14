@@ -43,7 +43,7 @@ function Analytics() {
       categoryTotals[p.category] = (categoryTotals[p.category] || 0) + totalRevenue;
 
       p.sales.forEach((s) => {
-        const month = s.created_at.substring(0, 7)||'none';
+        const month = s.created_at? s.created_at.substring(0, 7):'unknown';
         monthlyRevenueTotals[month] = (monthlyRevenueTotals[month] || 0) + totalRevenue;
         customerGrowthData[month] = (customerGrowthData[month] || 0) + 1;
       });
