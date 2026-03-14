@@ -37,7 +37,7 @@ def create_stock_alert(product):
 
 with app.app_context():
     print("Creating database tables if they don't exist...")
-    db.create_all()
+    # db.create_all()
 
     print("Clearing old data...")
     db.session.execute(text(f'DELETE FROM {Alert.__tablename__}'))
@@ -64,7 +64,7 @@ with app.app_context():
             role=udata["role"],
             profile_image=f"https://i.pravatar.cc/150?img={random.randint(1,70)}"
         )
-        u.password_hash = "12345"
+        u.password_hash = "12345678"
         db.session.add(u)
         users.append(u)
 
@@ -76,7 +76,7 @@ with app.app_context():
             role=random.choice(["admin", "staff"]),
             profile_image=f"https://i.pravatar.cc/150?img={random.randint(1,70)}"
         )
-        u.password_hash = "12345"
+        u.password_hash = "12345678"
         db.session.add(u)
         users.append(u)
     db.session.flush()
@@ -115,7 +115,8 @@ with app.app_context():
         o = Order(
             user_id=random.choice(users).id,
             total_amount=random.randint(1000, 50000),
-            order_date=random_date_within()
+            order_date=random_date_within(),
+            status=random.choice(['pending','completed'])
         )
         db.session.add(o)
         orders.append(o)
@@ -128,6 +129,7 @@ with app.app_context():
         sale = Sale(
             user_id=random.choice(users).id,
             product_id=product.id,
+            order_id=random.choice(orders).id,
             quantity=quantity,
             total_price=round(product.price * quantity, 2),
             created_at=random_date_within()

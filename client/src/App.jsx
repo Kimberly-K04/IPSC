@@ -43,16 +43,20 @@ function App() {
             fetch('/api/alerts')
           ])
 
-          const extractData=async(result)=>{
-            if(result.status!=='fulfilled'||!result.value.ok) return []
-
-            try{
-              const json=await result.value.json()
-              // console.log(json.data)
-              // console.log(result.value)
-              return json.data||[]
-            }catch(err){
-              console.log(err)
+          const extractData = async (result) => {
+            if (result.status !== 'fulfilled' || !result.value.ok) {
+              if (result.status === 'fulfilled' && !result.value.ok) {
+                // Log the error response body
+                const errorText = await result.value.text()
+                console.error('Error response:', errorText)
+              }
+              return []
+            }
+            try {
+              const json = await result.value.json()
+              return json.data || []
+            } catch (err) {
+              console.error(err)
               return []
             }
           }

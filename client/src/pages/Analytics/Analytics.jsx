@@ -39,11 +39,11 @@ function Analytics() {
     const customerGrowthData = {};
     const categoryTotals = {};
     const productsRevenue = products.map((p) => {
-      const totalRevenue = p.sales.reduce((sum, s) => sum + s.unitsSold * p.price, 0);
+      const totalRevenue = p.sales.reduce((sum, s) => sum + s.quantity * p.price, 0);
       categoryTotals[p.category] = (categoryTotals[p.category] || 0) + totalRevenue;
 
       p.sales.forEach((s) => {
-        const month = s.date.substring(0, 7);
+        const month = s.created_at.substring(0, 7)||'none';
         monthlyRevenueTotals[month] = (monthlyRevenueTotals[month] || 0) + totalRevenue;
         customerGrowthData[month] = (customerGrowthData[month] || 0) + 1;
       });
