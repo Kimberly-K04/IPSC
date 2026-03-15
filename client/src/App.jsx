@@ -1,3 +1,12 @@
+import './App.css'
+import NavBar from './components/NavBar'
+import { Outlet, useNavigate} from 'react-router-dom'
+import './index.css'
+import Header from './components/Header'
+import {useState, useEffect} from 'react'
+import SkeletomComp from './components/SkeletomComp'
+import FetchError from './components/FetchError'
+
 function App() {
   const navigate = useNavigate()
 
@@ -120,3 +129,5 @@ function App() {
     </main>
   )
 }
+
+export default App
