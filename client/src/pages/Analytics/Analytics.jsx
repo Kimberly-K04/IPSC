@@ -32,7 +32,7 @@ function Analytics() {
   const [customerGrowth, setCustomerGrowth] = useState([]);
   const [salesByCategory, setSalesByCategory] = useState([]);
 
-  const { products, orders, sales, refreshData, user } = useOutletContext();
+  const { products, orders, sales, addOrderAndSale, user } = useOutletContext();
 
   useEffect(() => {
     if (!products || products.length === 0) return;
@@ -180,7 +180,7 @@ function Analytics() {
         products={products}
         orders={orders}
         sales={sales}
-        onOrderAdded={refreshData}
+        onOrderAdded={addOrderAndSale}
         user={user}
       />
     </div>

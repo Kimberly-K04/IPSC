@@ -11,8 +11,8 @@ export default function SalesOrdersPanel({ products, orders, sales, onOrderAdded
 
   const handleAddOrder = async (e) => {
     e.preventDefault()
-    if (!selectedProductId || parseInt(quantity)<5) {
-      alert("Please select a product and enter a valid quantity.");
+    if (!selectedProductId || Number(quantity)<5) {
+      alert("Please select a product and enter a valid quantity greater than 5.");
       return
     }
 
@@ -57,10 +57,14 @@ export default function SalesOrdersPanel({ products, orders, sales, onOrderAdded
         const err = await saleRes.json()
         throw new Error(err.error || 'Failed to create sale')
       }
-      if (onOrderAdded) onOrderAdded()
+      const saleData = await saleRes.json()
+      const newSale = saleData.data||saleData
+
+      if (onOrderAdded) onOrderAdded(newOrder,newSale)
+
       setShowAddOrder(false)
       setSelectedProductId("")
-      setQuantity(1)
+      setQuantity('')
     } catch (error) {
       alert(error.message)
     } finally {
@@ -134,7 +138,7 @@ export default function SalesOrdersPanel({ products, orders, sales, onOrderAdded
             {sales.map(sale => (
               <tr key={sale.id}>
                 <td>{sale.order_id}</td>
-                <td>{products.find(p => p.id === sale.product_id)?.name || "Unknown"}</td>
+                <td>{products.find(p => Number(p.id) === Number(sale.product_id))?.name || "Unknown"}</td>
                 <td>{sale.quantity}</td>
                 <td>${Number(sale.total_price).toLocaleString()}</td>
               </tr>

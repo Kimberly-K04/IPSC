@@ -2,73 +2,50 @@ import React, { useState, useEffect } from "react";
 import { FaSearch, FaPlus, FaTimes } from "react-icons/fa"; 
 import "./ProductPage.css"; 
 import { useOutletContext } from "react-router-dom";
-import MenuItem from '@mui/material/MenuItem';
 
 const ProductPage = () => {
-  const APIBaseurl = "/api";
+  const { products, suppliers, refreshData, addProduct } = useOutletContext();
 
-  const [masterProductList, setMasterProductList] = useState([]);
   const [displayedProducts, setDisplayedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  
+
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newProduct, setNewProduct] = useState({
-    name: "", category: "", stock_quantity: "", price: "", supplier_id:""
+    name: "", category: "", stock_quantity: "", price: "", supplier_id: ""
   });
-  const {products, suppliers}=useOutletContext()
 
-  // INITIAL FETCH 
+  
   useEffect(() => {
-    fetch(`${APIBaseurl}/products`)
-      .then((res) => {
-        if (!res.ok) throw new Error("Network response was not ok");
-        return res.json();
-      })
-      .then((responseBody) => {
-        // Look for 'data' key based on your console output
-        const actualList = responseBody.data || [];
-        setMasterProductList(actualList);
-        setDisplayedProducts(actualList);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Error fetching data:", err);
-        setLoading(false);
-        setMasterProductList([]);
-        setDisplayedProducts([]);
-      });
-  }, [APIBaseurl]);
-
-  // FILTERING LOGIC 
-  useEffect(() => {
-    let result = [...masterProductList];
-
-    // Filter by Category
-    if (selectedCategory !== "All") {
-      result = result.filter(product => {
-        const prodCat = (product.category || "").toLowerCase();
-        const selectedCat = selectedCategory.toLowerCase();
-        return prodCat === selectedCat;
-      });
+    if (!products || products.length === 0) {
+      setDisplayedProducts([]);
+      setLoading(false);
+      return;
     }
 
-    // Filter by Search Term
+    let result = [...products];
+
+    if (selectedCategory !== "All") {
+      result = result.filter(product =>
+        (product.category || "").toLowerCase() === selectedCategory.toLowerCase()
+      );
+    }
+
     if (searchTerm) {
       const lowerTerm = searchTerm.toLowerCase();
-      result = result.filter(product => 
+      result = result.filter(product =>
         (product.name || "").toLowerCase().includes(lowerTerm) ||
         (product.category || "").toLowerCase().includes(lowerTerm)
       );
     }
 
     setDisplayedProducts(result);
-  }, [searchTerm, selectedCategory, masterProductList]);
+    setLoading(false);
+  }, [products, searchTerm, selectedCategory]);
 
-  // HANDLERS 
   const handleCategorySelect = (category) => {
     setSelectedCategory(category);
     setIsCategoryOpen(false);
@@ -86,41 +63,42 @@ const ProductPage = () => {
       category: newProduct.category,
       stock_quantity: parseInt(newProduct.stock_quantity) || 0,
       price: parseFloat(newProduct.price) || 0,
-      supplier_id:parseInt(newProduct.supplier_id)
+      supplier_id: parseInt(newProduct.supplier_id)
     };
 
     try {
-      const response = await fetch(`${APIBaseurl}/products`, {
+      const response = await fetch('/api/products', {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(productToAdd),
       });
 
       if (response.ok) {
+        // Refresh all data from the server
+        // if (refreshData) refreshData();
         const savedProduct = await response.json();
-        // Backend usually returns the new object inside a 'data' wrapper or directly
         const newObj = savedProduct.data || savedProduct;
-        setMasterProductList(prev => [newObj, ...prev]);
+        addProduct(newObj)
         setIsModalOpen(false);
-        setNewProduct({ name: "", category: "", stock_quantity: "", price: "", supplier_id:"" });
+        setNewProduct({ name: "", category: "", stock_quantity: "", price: "", supplier_id: "" });
+      } else {
+        const err = await response.json();
+        alert(err.error || "Failed to add product.");
       }
     } catch (error) {
-      console.log(error)
-      alert("Failed to add product.");
+      console.error(error);
+      alert("Network error. Please try again.");
     }
   };
-  const nonDuplicateCategory = [...new Set(products.map(item => item.category))].filter(Boolean)
-  const renderCategories = nonDuplicateCategory.map(cat=>{
-        return(
-            <option key={cat} value={cat}>{cat}</option>
-        )
-    })
 
-    const renderSuppliers=suppliers.map(sup=>{
-      return(
-        <option key={sup.id} value={sup.id}>{sup.name}</option>
-      )
-    })
+  const nonDuplicateCategory = [...new Set(products.map(item => item.category))].filter(Boolean);
+  const renderCategories = nonDuplicateCategory.map(cat => (
+    <option key={cat} value={cat}>{cat}</option>
+  ));
+
+  const renderSuppliers = suppliers.map(sup => (
+    <option key={sup.id} value={sup.id}>{sup.name}</option>
+  ));
 
   return (
     <div className="product-page-container">
@@ -129,9 +107,9 @@ const ProductPage = () => {
         <div className="header-actions">
           <div className="search-bar-container">
             <FaSearch className="search-icon" />
-            <input 
-              type="text" 
-              placeholder="Search products..." 
+            <input
+              type="text"
+              placeholder="Search products..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="search-input"
@@ -144,18 +122,18 @@ const ProductPage = () => {
         <button className="btn-add" onClick={() => setIsModalOpen(true)}>
           <FaPlus /> Add product
         </button>
-        
+
         <div className="category-dropdown-container">
-          <button 
-            className="btn-category" 
+          <button
+            className="btn-category"
             onClick={() => setIsCategoryOpen(!isCategoryOpen)}
           >
-             {selectedCategory === "All" ? "Categories" : selectedCategory} ▼
+            {selectedCategory === "All" ? "Categories" : selectedCategory} ▼
           </button>
 
           {isCategoryOpen && (
             <div className="dropdown-menu">
-              {["All", "Electronics", "Office", "Home"].map(cat => (
+              {["All", ...nonDuplicateCategory].map(cat => (
                 <div key={cat} className="dropdown-item" onClick={() => handleCategorySelect(cat)}>
                   {cat === "All" ? "All Categories" : cat}
                 </div>
@@ -181,10 +159,8 @@ const ProductPage = () => {
               <tr><td colSpan="5" className="text-center">Loading inventory...</td></tr>
             ) : (
               displayedProducts.map((product) => {
-                // Determine stock value from whichever key the backend uses
                 const currentStock = product.stock ?? product.stock_quantity ?? 0;
                 const currentPrice = product.price ?? 0;
-                
                 return (
                   <tr key={product.id}>
                     <td className="product-name">{product.name || "N/A"}</td>
@@ -200,9 +176,9 @@ const ProductPage = () => {
             )}
           </tbody>
         </table>
-        
+
         {!loading && displayedProducts.length === 0 && (
-          <div style={{padding: '2rem', textAlign: 'center', color: '#888'}}>
+          <div style={{ padding: '2rem', textAlign: 'center', color: '#888' }}>
             No products found. Try changing the category or search term.
           </div>
         )}
@@ -213,19 +189,25 @@ const ProductPage = () => {
           <div className="modal-content">
             <div className="modal-header">
               <h2>Add Product</h2>
-              <button onClick={() => setIsModalOpen(false)} className="close-btn"><FaTimes/></button>
+              <button onClick={() => setIsModalOpen(false)} className="close-btn"><FaTimes /></button>
             </div>
             <form onSubmit={handleAddProduct} className="modal-form">
-              
-              <input id='name' name="name" placeholder="Product Name" value={newProduct.name} onChange={handleInputChange} required />
-              <label htmlFor="category">Category: 
-                <select id='category' 
-                  name="category" 
-                  value={newProduct.category} 
-                  onChange={handleInputChange} 
+              <input
+                name="name"
+                placeholder="Product Name"
+                value={newProduct.name}
+                onChange={handleInputChange}
+                required
+              />
+              <label htmlFor="category">Category:
+                <select
+                  id="category"
+                  name="category"
+                  value={newProduct.category}
+                  onChange={handleInputChange}
                   required
                 >
-                  <option>Select Category</option>
+                  <option value="">Select Category</option>
                   {renderCategories}
                 </select>
               </label>
@@ -241,10 +223,25 @@ const ProductPage = () => {
                   {renderSuppliers}
                 </select>
               </label>
-              <input type="number" name="stock_quantity" placeholder="Stock" value={newProduct.stock_quantity} onChange={handleInputChange} required />
-              <input type="number" name="price" placeholder="Price" value={newProduct.price} onChange={handleInputChange} required />
-              
-              <button type="submit" className="btn-add" style={{justifyContent:'center', marginTop:'1rem'}}>Save Product</button>
+              <input
+                type="number"
+                name="stock_quantity"
+                placeholder="Stock"
+                value={newProduct.stock_quantity}
+                onChange={handleInputChange}
+                required
+              />
+              <input
+                type="number"
+                name="price"
+                placeholder="Price"
+                value={newProduct.price}
+                onChange={handleInputChange}
+                required
+              />
+              <button type="submit" className="btn-add" style={{ justifyContent: 'center', marginTop: '1rem' }}>
+                Save Product
+              </button>
             </form>
           </div>
         </div>

@@ -111,6 +111,15 @@ function App() {
   }
 
   if (loading) return <SkeletomComp/>
+
+  const addProduct = (newProduct) => {
+  setProducts(prev => [newProduct, ...prev]);
+};
+
+const addOrderAndSale = (newOrder, newSale) => {
+  setOrders(prev => [newOrder, ...prev]);
+  setSales(prev => [newSale, ...prev]);
+};
   
   // Return the main UI
   return (
@@ -124,6 +133,7 @@ function App() {
             onProfileEdit: handleProfileEdit,
             onLogOut: handleLogOut,
             refreshData:loadData,
+            addProduct,addOrderAndSale,
             sending
           }}/>
         }

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import './Alerts.css';
 import {
@@ -8,54 +8,33 @@ import {
 } from 'react-icons/ai';
 
 function Alerts() {
-  const [alerts, setAlerts] = useState([]);
+  const { alerts, products, refreshData } = useOutletContext();
   const [filter, setFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
-  const [loading, setLoading] = useState(true);
+  const [loading] = useState(false);
 
-  const { products } = useOutletContext();
-
-  useEffect(() => {
-    async function fetchAlerts() {
-      try {
-        const res = await fetch('api/alerts');
-        if (!res.ok) throw new Error('Failed to fetch alerts');
-
-        const data = await res.json();
-        const alertsWithNames = data.data.map(alert => {
-          const product = products.find(p => p.id === alert.product_id);
-          return {
-            ...alert,
-            product_name: product ? product.name : null,
-            type: alert.message.split(':')[0]  // Extract CRITICAL/WARNING/INFO
-          };
-        });
-
-        setAlerts(alertsWithNames);
-        setLoading(false);
-      } catch (err) {
-        console.error(err);
-        setLoading(false);
-      }
-    }
-
-    fetchAlerts();
-  }, [products]);
+  // Enrich alerts with product name and extract type from message
+  const enrichedAlerts = useMemo(() => {
+    return alerts.map(alert => {
+      const product = products.find(p => p.id === alert.product_id);
+      return {
+        ...alert,
+        product_name: product ? product.name : null,
+        type: alert.message?.split(':')[0] || 'INFO' // Extract CRITICAL/WARNING/INFO
+      };
+    });
+  }, [alerts, products]);
 
   const acknowledgeAlert = async (id) => {
     try {
-      const res = await fetch(`api/alerts/${id}`, {
+      const res = await fetch(`/api/alerts/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'read' }),
       });
-
       if (!res.ok) throw new Error('Failed to update alert');
-
-      const updatedAlert = await res.json();
-      setAlerts(prev =>
-        prev.map(a => (a.id === updatedAlert.data.id ? { ...a, status: 'read' } : a))
-      );
+      // Refresh all data from server
+      if (refreshData) refreshData();
     } catch (err) {
       console.error(err);
     }
@@ -63,24 +42,27 @@ function Alerts() {
 
   const deleteAlert = async (id) => {
     try {
-      const res = await fetch(`api/alerts/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/alerts/${id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('Failed to delete alert');
-
-      setAlerts(prev => prev.filter(a => a.id !== id));
+      if (refreshData) refreshData();
     } catch (err) {
       console.error(err);
     }
   };
 
-  const sortedAlerts = [...alerts].sort((a, b) => (a.status === 'read') - (b.status === 'read'));
+  const sortedAlerts = useMemo(() => {
+    return [...enrichedAlerts].sort((a, b) => (a.status === 'read') - (b.status === 'read'));
+  }, [enrichedAlerts]);
 
-  const filteredAlerts = sortedAlerts.filter(alert => {
-    const matchFilter = filter === 'all' || alert.type.toLowerCase() === filter;
-    const matchSearch =
-      alert.message.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (alert.product_name && alert.product_name.toLowerCase().includes(searchTerm.toLowerCase()));
-    return matchFilter && matchSearch;
-  });
+  const filteredAlerts = useMemo(() => {
+    return sortedAlerts.filter(alert => {
+      const matchFilter = filter === 'all' || alert.type?.toLowerCase() === filter;
+      const matchSearch =
+        alert.message.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (alert.product_name && alert.product_name.toLowerCase().includes(searchTerm.toLowerCase()));
+      return matchFilter && matchSearch;
+    });
+  }, [sortedAlerts, filter, searchTerm]);
 
   const getIcon = (type) => {
     switch (type) {
@@ -122,7 +104,7 @@ function Alerts() {
         {filteredAlerts.map(alert => (
           <div
             key={alert.id}
-            className={`alert-card ${alert.type.toLowerCase()} ${alert.status === 'read' ? 'acknowledged fade-out' : ''}`}
+            className={`alert-card ${alert.type?.toLowerCase()} ${alert.status === 'read' ? 'acknowledged fade-out' : ''}`}
           >
             <div className="alert-top">
               <h3>
