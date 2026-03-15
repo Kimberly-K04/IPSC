@@ -26,57 +26,13 @@ function KPICard({ title, value, icon, chart }) {
   );
 }
 
-// export default function Analytics(){
-//   const { products, orders, sales } = useOutletContext();
-
-//   // Prepare chart data
-//   const monthlyRevenue = [];
-//   const customerGrowth = [];
-//   const topProducts = [];
-//   const salesByCategory = [];
-
-//   // Simple aggregation logic
-//   const monthlyTotals = {};
-//   const categoryTotals = {};
-//   const productRevenue = {};
-
-//   sales.forEach(sale => {
-//     // Monthly revenue
-//     const month = new Date(sale.order_date || sale.created_at).toISOString().substring(0,7);
-//     monthlyTotals[month] = (monthlyTotals[month] || 0) + Number(sale.total_price);
-
-//     // Customer growth (count sales as proxy)
-//     customerGrowth.push({ month, customers: (monthlyTotals[month] || 0) + 1 });
-
-//     // Product revenue
-//     productRevenue[sale.product_id] = (productRevenue[sale.product_id] || 0) + Number(sale.total_price);
-
-//     // Category totals
-//     const prod = products.find(p => p.id === sale.product_id);
-//     if(prod) categoryTotals[prod.category] = (categoryTotals[prod.category] || 0) + Number(sale.total_price);
-//   });
-
-//   // Prepare arrays for charts
-//   Object.keys(monthlyTotals).sort().forEach(m => monthlyRevenue.push({ month: m, revenue: monthlyTotals[m] }));
-//   Object.keys(productRevenue).sort().forEach(pid => {
-//     const prod = products.find(p => p.id === Number(pid));
-//     if(prod) topProducts.push({ name: prod.name, revenue: productRevenue[pid] });
-//   });
-//   topProducts.sort((a,b)=>b.revenue - a.revenue);
-//   Object.keys(categoryTotals).forEach(cat => salesByCategory.push({ category: cat, sales: categoryTotals[cat] }));
-
-//   // Text colors from CSS variables
-//   const rootStyles = getComputedStyle(document.documentElement);
-//   const textColor = rootStyles.getPropertyValue("--textColor").trim();
-//   const cardBg = rootStyles.getPropertyValue("--cardBg").trim();
-
 function Analytics() {
   const [monthlyRevenue, setMonthlyRevenue] = useState([]);
   const [topProducts, setTopProducts] = useState([]);
   const [customerGrowth, setCustomerGrowth] = useState([]);
   const [salesByCategory, setSalesByCategory] = useState([]);
 
-  const { products, orders, sales } = useOutletContext();
+  const { products, orders, sales, refreshData, user } = useOutletContext();
 
   useEffect(() => {
     if (!products || products.length === 0) return;
@@ -220,10 +176,12 @@ function Analytics() {
       </div>
 
       {/* Sales & Orders Panel embedded */}
-      <SalesOrdersPanel 
+      <SalesOrdersPanel
         products={products}
         orders={orders}
         sales={sales}
+        onOrderAdded={refreshData}
+        user={user}
       />
     </div>
   );

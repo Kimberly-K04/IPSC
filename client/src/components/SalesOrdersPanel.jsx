@@ -1,12 +1,72 @@
 import React, { useState } from "react";
-// import { useOutletContext } from "react-router-dom";
 import "./css/salesOrdersPanel.css";
 
-export default function SalesOrdersPanel({ products, orders, sales }) {
-  // const { products, orders, sales } = useOutletContext();
+export default function SalesOrdersPanel({ products, orders, sales, onOrderAdded, user }) {
   const [showAddOrder, setShowAddOrder] = useState(false);
+  const [selectedProductId, setSelectedProductId] = useState("")
+  const [quantity, setQuantity] = useState('')
+  const [loading, setLoading] = useState(false)
 
   const totalRevenue = sales.reduce((sum, s) => sum + Number(s.total_price), 0);
+
+  const handleAddOrder = async (e) => {
+    e.preventDefault()
+    if (!selectedProductId || parseInt(quantity)<5) {
+      alert("Please select a product and enter a valid quantity.");
+      return
+    }
+
+    const product = products.find(p => p.id === Number(selectedProductId))
+    if (!product) return
+
+    const totalAmount = product.price * quantity
+
+    setLoading(true)
+    try {
+      const orderRes = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          status: 'pending',
+          total_amount: totalAmount,
+          user_id:user.id
+        })
+      })
+
+      if (!orderRes.ok) {
+        const err = await orderRes.json();
+        throw new Error(err.error || 'Failed to create order')
+      }
+
+      const orderData = await orderRes.json()
+      const newOrder = orderData.data || orderData
+
+      const saleRes = await fetch('/api/sales', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          product_id: Number(selectedProductId),
+          order_id: newOrder.id,
+          quantity: quantity,
+          total_price: totalAmount,
+          user_id: user.id
+        })
+      })
+
+      if (!saleRes.ok) {
+        const err = await saleRes.json()
+        throw new Error(err.error || 'Failed to create sale')
+      }
+      if (onOrderAdded) onOrderAdded()
+      setShowAddOrder(false)
+      setSelectedProductId("")
+      setQuantity(1)
+    } catch (error) {
+      alert(error.message)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <div className="sales-orders-panel">
@@ -32,16 +92,31 @@ export default function SalesOrdersPanel({ products, orders, sales }) {
       </button>
 
       {showAddOrder && (
-        <div className="new-order-form">
+        <form onSubmit={handleAddOrder} className="new-order-form">
           <div className="sale-row">
-            <select>
+            <select
+              value={selectedProductId}
+              onChange={(e) => setSelectedProductId(e.target.value)}
+              required
+            >
               <option value="">Select Product</option>
-              {products.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+              {products.map(p => (
+                <option key={p.id} value={p.id}>{p.name} (${p.price})</option>
+              ))}
             </select>
-            <input type="number" placeholder="Quantity" min="1" />
+            <input
+              type="number"
+              placeholder="Quantity"
+              min="1"
+              value={quantity}
+              onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
+              required
+            />
           </div>
-          <button className="btn-add">Save Order</button>
-        </div>
+          <button type="submit" className="btn-add" disabled={loading}>
+            {loading ? "Saving..." : "Save Order"}
+          </button>
+        </form>
       )}
 
       <div className="order-card">

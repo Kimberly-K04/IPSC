@@ -3,7 +3,7 @@ import NavBar from './components/NavBar'
 import { Outlet, useNavigate} from 'react-router-dom'
 import './index.css'
 import Header from './components/Header'
-import {useState, useEffect} from 'react'
+import {useState, useEffect, useCallback} from 'react'
 import SkeletomComp from './components/SkeletomComp'
 import FetchError from './components/FetchError'
 
@@ -20,8 +20,7 @@ function App() {
   const [error, setError] = useState("")
   const [sending, setSending] = useState(false)
 
-  useEffect(() => {
-    async function loadData() {
+  const loadData=useCallback (async  ()=>{
       setLoading(true)
       try {
         const checkSessionRes = await fetch('/api/check_session')
@@ -71,9 +70,11 @@ function App() {
       } finally {
         setLoading(false)
       }
-    }
+    }, [navigate])
+
+  useEffect(() => {
     loadData()
-  }, [navigate])
+  }, [loadData])
 
   // Profile and Logout logic
   async function handleProfileEdit(e, formObj){
@@ -122,6 +123,7 @@ function App() {
             user, products, sales, orders, suppliers, alerts,
             onProfileEdit: handleProfileEdit,
             onLogOut: handleLogOut,
+            refreshData:loadData,
             sending
           }}/>
         }

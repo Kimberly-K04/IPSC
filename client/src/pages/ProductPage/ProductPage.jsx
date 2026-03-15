@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { FaSearch, FaPlus, FaTimes } from "react-icons/fa"; 
 import "./ProductPage.css"; 
+import { useOutletContext } from "react-router-dom";
+import MenuItem from '@mui/material/MenuItem';
 
 const ProductPage = () => {
   const APIBaseurl = "/api";
@@ -15,8 +17,9 @@ const ProductPage = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newProduct, setNewProduct] = useState({
-    name: "", category: "", stock: "", price: ""
+    name: "", category: "", stock_quantity: "", price: "", supplier_id:""
   });
+  const {products, suppliers}=useOutletContext()
 
   // INITIAL FETCH 
   useEffect(() => {
@@ -81,9 +84,9 @@ const ProductPage = () => {
     const productToAdd = {
       name: newProduct.name,
       category: newProduct.category,
-      stock_quantity: parseInt(newProduct.stock) || 0,
+      stock_quantity: parseInt(newProduct.stock_quantity) || 0,
       price: parseFloat(newProduct.price) || 0,
-      supplier_id: 1 
+      supplier_id:parseInt(newProduct.supplier_id)
     };
 
     try {
@@ -99,12 +102,25 @@ const ProductPage = () => {
         const newObj = savedProduct.data || savedProduct;
         setMasterProductList(prev => [newObj, ...prev]);
         setIsModalOpen(false);
-        setNewProduct({ name: "", category: "", stock: "", price: "" });
+        setNewProduct({ name: "", category: "", stock_quantity: "", price: "", supplier_id:"" });
       }
     } catch (error) {
+      console.log(error)
       alert("Failed to add product.");
     }
   };
+  const nonDuplicateCategory = [...new Set(products.map(item => item.category))].filter(Boolean)
+  const renderCategories = nonDuplicateCategory.map(cat=>{
+        return(
+            <option key={cat} value={cat}>{cat}</option>
+        )
+    })
+
+    const renderSuppliers=suppliers.map(sup=>{
+      return(
+        <option key={sup.id} value={sup.id}>{sup.name}</option>
+      )
+    })
 
   return (
     <div className="product-page-container">
@@ -170,7 +186,7 @@ const ProductPage = () => {
                 const currentPrice = product.price ?? 0;
                 
                 return (
-                  <tr key={product.id || Math.random()}>
+                  <tr key={product.id}>
                     <td className="product-name">{product.name || "N/A"}</td>
                     <td>{product.category || "General"}</td>
                     <td className="text-center">{currentStock}</td>
@@ -200,15 +216,34 @@ const ProductPage = () => {
               <button onClick={() => setIsModalOpen(false)} className="close-btn"><FaTimes/></button>
             </div>
             <form onSubmit={handleAddProduct} className="modal-form">
-              <input name="name" placeholder="Product Name" value={newProduct.name} onChange={handleInputChange} required />
-              <select name="category" value={newProduct.category} onChange={handleInputChange} required>
-                <option value="">Select Category</option>
-                <option value="Electronics">Electronics</option>
-                <option value="Office">Office</option>
-                <option value="Home">Home</option>
-              </select>
-              <input type="number" name="stock" placeholder="Stock" value={newProduct.stock} onChange={handleInputChange} required />
+              
+              <input id='name' name="name" placeholder="Product Name" value={newProduct.name} onChange={handleInputChange} required />
+              <label htmlFor="category">Category: 
+                <select id='category' 
+                  name="category" 
+                  value={newProduct.category} 
+                  onChange={handleInputChange} 
+                  required
+                >
+                  <option>Select Category</option>
+                  {renderCategories}
+                </select>
+              </label>
+              <label htmlFor="supplier_id">Supplier:
+                <select
+                  id="supplier_id"
+                  name="supplier_id"
+                  value={newProduct.supplier_id}
+                  onChange={handleInputChange}
+                  required
+                >
+                  <option value="">Select Supplier</option>
+                  {renderSuppliers}
+                </select>
+              </label>
+              <input type="number" name="stock_quantity" placeholder="Stock" value={newProduct.stock_quantity} onChange={handleInputChange} required />
               <input type="number" name="price" placeholder="Price" value={newProduct.price} onChange={handleInputChange} required />
+              
               <button type="submit" className="btn-add" style={{justifyContent:'center', marginTop:'1rem'}}>Save Product</button>
             </form>
           </div>
