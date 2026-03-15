@@ -9,6 +9,7 @@ import ErrorPage from './pages/ErrorPage/ErrorPage'
 import Login from './pages/Login/Login'
 import SignUp from './pages/SignUp/SignUp'
 import PublicLayout from './PublicLayout'
+import SalesOrdersPanel from './components/SalesOrdersPanel'
 
 const routes = [
     {

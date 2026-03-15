@@ -17,6 +17,7 @@ class Product(db.Model, SerializerMixin):
     price = db.Column(db.Numeric(10, 2), nullable=False)
     stock_quantity = db.Column(db.Integer, default=0)
     supplier_id = db.Column(db.Integer, db.ForeignKey('suppliers.id'), nullable=False)
+    category=db.Column(db.String)
 
     # Relationships
     sales = db.relationship('Sale', backref='product', lazy=True)
@@ -31,14 +32,14 @@ class Product(db.Model, SerializerMixin):
     
    
 
-def to_dict(self):
-    return {
-        "id": self.id,
-        "name": self.name,
-        "category": self.category,  # Change this from "Electronics" to self.category
-        "stock": self.stock_quantity,
-        "price": self.price_as_float,
-        "supplier_id": self.supplier_id,
-        "sales": [s.to_dict() for s in self.sales] if hasattr(self, 'sales') else [],
-        "alerts": [a.to_dict() for a in self.alerts] if hasattr(self, 'alerts') else []
-    }
+# def to_dict(self):
+#     return {
+#         "id": self.id,
+#         "name": self.name,
+#         "category": self.category,  # Change this from "Electronics" to self.category
+#         "stock": self.stock_quantity,
+#         "price": self.price_as_float,
+#         "supplier_id": self.supplier_id,
+#         "sales": [s.to_dict() for s in self.sales] if hasattr(self, 'sales') else [],
+#         "alerts": [a.to_dict() for a in self.alerts] if hasattr(self, 'alerts') else []
+#     }

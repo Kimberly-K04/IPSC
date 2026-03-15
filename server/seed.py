@@ -83,7 +83,7 @@ with app.app_context():
 
     print("Fixed users for login:")
     for u in users:
-        print(f"{u.fullname} | {u.email} | password: 12345")
+        print(f"{u.fullname} | {u.email} | password: 12345678")
 
     # Suppliers
     suppliers = []
@@ -103,7 +103,8 @@ with app.app_context():
             name=fake.word().capitalize(),
             price=round(random.uniform(10, 2000), 2),
             stock_quantity=random.randint(1, 100),
-            supplier_id=random.choice(suppliers).id
+            supplier_id=random.choice(suppliers).id,
+            category=random.choice(['Electronics', 'Home Appliance', 'Furniture', 'Decor', 'Clothes'])
         )
         db.session.add(product)
         products.append(product)

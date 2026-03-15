@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { useOutletContext } from "react-router-dom";
-import "./css/SalesOrdersPanel.css";
+// import { useOutletContext } from "react-router-dom";
+import "./css/salesOrdersPanel.css";
 
-export default function SalesOrdersPanel() {
-  const { products, orders, sales } = useOutletContext();
+export default function SalesOrdersPanel({ products, orders, sales }) {
+  // const { products, orders, sales } = useOutletContext();
   const [showAddOrder, setShowAddOrder] = useState(false);
 
   const totalRevenue = sales.reduce((sum, s) => sum + Number(s.total_price), 0);
