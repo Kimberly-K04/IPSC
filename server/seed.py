@@ -10,7 +10,7 @@ from datetime import datetime, timedelta
 app = create_app()
 fake = Faker()
 
-NUM_USERS = 5
+NUM_RANDOM_USERS = 3
 NUM_SUPPLIERS = 3
 NUM_PRODUCTS = 10
 NUM_ORDERS = 15
@@ -18,8 +18,22 @@ NUM_SALES = 20
 NUM_ALERTS = 10
 
 def random_date_within(days=30):
-    """Return a random datetime within the past `days` days"""
-    return datetime.now() - timedelta(days=random.randint(0, days), hours=random.randint(0,23), minutes=random.randint(0,59))
+    return datetime.now() - timedelta(
+        days=random.randint(0, days),
+        hours=random.randint(0, 23),
+        minutes=random.randint(0, 59)
+    )
+
+def create_stock_alert(product):
+    """Automatically create a CRITICAL alert if stock is low"""
+    if product.stock_quantity < 10:
+        alert = Alert(
+            message=f"CRITICAL: {product.name} stock is at {product.stock_quantity}",
+            product_id=product.id,
+            status="unread",
+            created_at=datetime.now()
+        )
+        db.session.add(alert)
 
 with app.app_context():
     print("Creating database tables if they don't exist...")
@@ -36,19 +50,42 @@ with app.app_context():
 
     print("Seeding Users...")
     users = []
-    for _ in range(NUM_USERS):
+
+    # Fixed users for login
+    fixed_users = [
+        {"fullname": "Alice Johnson", "email": "alice@ipsc.com", "role": "admin"},
+        {"fullname": "Bob Smith", "email": "bob@ipsc.com", "role": "staff"},
+        {"fullname": "Charlie Davis", "email": "charlie@ipsc.com", "role": "staff"}
+    ]
+    for udata in fixed_users:
+        u = User(
+            fullname=udata["fullname"],
+            email=udata["email"],
+            role=udata["role"],
+            profile_image=f"https://i.pravatar.cc/150?img={random.randint(1,70)}"
+        )
+        u.password_hash = "12345678"
+        db.session.add(u)
+        users.append(u)
+
+    # Random users
+    for _ in range(NUM_RANDOM_USERS):
         u = User(
             fullname=fake.name(),
             email=fake.unique.email(),
             role=random.choice(["admin", "staff"]),
             profile_image=f"https://i.pravatar.cc/150?img={random.randint(1,70)}"
         )
-        u.password_hash = "12345"
+        u.password_hash = "12345678"
         db.session.add(u)
         users.append(u)
     db.session.flush()
 
-    print("Seeding Suppliers...")
+    print("Fixed users for login:")
+    for u in users:
+        print(f"{u.fullname} | {u.email} | password: 12345")
+
+    # Suppliers
     suppliers = []
     for _ in range(NUM_SUPPLIERS):
         s = Supplier(
@@ -59,7 +96,7 @@ with app.app_context():
         suppliers.append(s)
     db.session.flush()
 
-    print("Seeding Products...")
+    # Products
     products = []
     for _ in range(NUM_PRODUCTS):
         product = Product(
@@ -72,46 +109,49 @@ with app.app_context():
         products.append(product)
     db.session.flush()
 
-    print("Seeding Orders...")
+    # Orders
     orders = []
     for _ in range(NUM_ORDERS):
-        status = random.choice(["read", "unread"])
         o = Order(
             user_id=random.choice(users).id,
-            status=random.choice(products).id,
             total_amount=random.randint(1000, 50000),
-            order_date=random_date_within()
+            order_date=random_date_within(),
+            status=random.choice(['pending','completed'])
         )
         db.session.add(o)
         orders.append(o)
     db.session.flush()
 
-    print("Seeding Sales...")
+    # Sales
     for _ in range(NUM_SALES):
         product = random.choice(products)
         quantity = random.randint(1, 5)
         sale = Sale(
             user_id=random.choice(users).id,
             product_id=product.id,
+            order_id=random.choice(orders).id,
             quantity=quantity,
             total_price=round(product.price * quantity, 2),
-            # created_at=random_date_within()
+            created_at=random_date_within()
         )
         db.session.add(sale)
 
-    print("Seeding Alerts...")
-    for _ in range(NUM_ALERTS):
-        product = random.choice(products)
-        status = random.choice(["read", "unread"])
-        level = "CRITICAL" if product.stock_quantity < 10 else random.choice(["WARNING", "INFO"])
-        message = f"{level}: {product.name} stock is at {product.stock_quantity}"
-        alert = Alert(
-            message=message,
-            product_id=product.id,
-            status=status,
-            created_at=random_date_within()
-        )
-        db.session.add(alert)
+    # Alerts
+    for product in products:
+        create_stock_alert(product)
+
+        # Random other alerts
+        for _ in range(random.randint(0, 2)):
+            status = random.choice(["read", "unread"])
+            level = random.choice(["WARNING", "INFO"])
+            message = f"{level}: {product.name} stock is at {product.stock_quantity}"
+            alert = Alert(
+                message=message,
+                product_id=product.id,
+                status=status,
+                created_at=random_date_within()
+            )
+            db.session.add(alert)
 
     db.session.commit()
     print("Database seeded with Users, Suppliers, Products, Orders, Sales, and Alerts!")

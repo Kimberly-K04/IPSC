@@ -102,6 +102,14 @@ a:hover{
     color: var(--success);
 }
 
+input{
+    padding: 10px;
+    margin-top: 25px;
+    border-radius: 15px;
+    font-size: 1.3rem;
+    inline-size: 100%;
+}
+
 
 .main-wrapper{
     display: flex;

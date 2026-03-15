@@ -69,6 +69,51 @@ export default function Analytics() {
   const rootStyles = getComputedStyle(document.documentElement);
   const textColor = rootStyles.getPropertyValue("--textColor").trim();
   const cardBg = rootStyles.getPropertyValue("--cardBg").trim();
+function Analytics() {
+  const [monthlyRevenue, setMonthlyRevenue] = useState([]);
+  const [topProducts, setTopProducts] = useState([]);
+  const [customerGrowth, setCustomerGrowth] = useState([]);
+  const [salesByCategory, setSalesByCategory] = useState([]);
+
+  const { products } = useOutletContext();
+
+  useEffect(() => {
+    if (!products || products.length === 0) return;
+
+    const monthlyRevenueTotals = {};
+    const customerGrowthData = {};
+    const categoryTotals = {};
+    const productsRevenue = products.map((p) => {
+      const totalRevenue = p.sales.reduce((sum, s) => sum + s.quantity * p.price, 0);
+      categoryTotals[p.category] = (categoryTotals[p.category] || 0) + totalRevenue;
+
+      p.sales.forEach((s) => {
+        const month = s.created_at? s.created_at.substring(0, 7):'unknown';
+        monthlyRevenueTotals[month] = (monthlyRevenueTotals[month] || 0) + totalRevenue;
+        customerGrowthData[month] = (customerGrowthData[month] || 0) + 1;
+      });
+
+      return { name: p.name, revenue: totalRevenue };
+    });
+
+    setMonthlyRevenue(
+      Object.keys(monthlyRevenueTotals).map((m) => ({ month: m, revenue: monthlyRevenueTotals[m] }))
+    );
+    setTopProducts(productsRevenue.sort((a,b)=>b.revenue - a.revenue).slice(0,5));
+    setCustomerGrowth(
+      Object.keys(customerGrowthData).map((m)=>({ month: m, customers: customerGrowthData[m] }))
+    );
+    setSalesByCategory(
+      Object.keys(categoryTotals).map((c)=>({ category: c, sales: categoryTotals[c] }))
+    );
+  }, [products]);
+
+  const totalRevenue = monthlyRevenue.reduce((sum, m) => sum + m.revenue, 0);
+  const totalCustomers = customerGrowth.reduce((sum, c) => sum + c.customers, 0);
+  const topProduct = topProducts[0]?.name || "-";
+
+  const textColor = getComputedStyle(document.documentElement).getPropertyValue('--textColor').trim();
+  const cardBg = getComputedStyle(document.documentElement).getPropertyValue('--cardBg').trim();
 
   const chartsData = [
     {

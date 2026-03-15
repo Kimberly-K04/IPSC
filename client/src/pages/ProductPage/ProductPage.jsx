@@ -3,63 +3,69 @@ import { FaSearch, FaPlus, FaTimes } from "react-icons/fa";
 import "./ProductPage.css"; 
 
 const ProductPage = () => {
-  const APIBaseurl = import.meta.env.VITE_API_BASE_URL || "http://localhost:4000";
+  const APIBaseurl = "/api";
 
   const [masterProductList, setMasterProductList] = useState([]);
   const [displayedProducts, setDisplayedProducts] = useState([]);
-  
   const [loading, setLoading] = useState(true);
   
-  // Search & Filter State
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [isCategoryOpen, setIsCategoryOpen] = useState(false);
 
-  // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newProduct, setNewProduct] = useState({
     name: "", category: "", stock: "", price: ""
   });
 
-  //INITIAL FETCH 
+  // INITIAL FETCH 
   useEffect(() => {
     fetch(`${APIBaseurl}/products`)
-      .then((res) => res.json())
-      .then((data) => {
-        setMasterProductList(data);  // Save the full list
-        setDisplayedProducts(data);  // Show the full list initially
+      .then((res) => {
+        if (!res.ok) throw new Error("Network response was not ok");
+        return res.json();
+      })
+      .then((responseBody) => {
+        // Look for 'data' key based on your console output
+        const actualList = responseBody.data || [];
+        setMasterProductList(actualList);
+        setDisplayedProducts(actualList);
         setLoading(false);
       })
       .catch((err) => {
         console.error("Error fetching data:", err);
         setLoading(false);
+        setMasterProductList([]);
+        setDisplayedProducts([]);
       });
   }, [APIBaseurl]);
 
-  //FILTERING LOGIC 
+  // FILTERING LOGIC 
   useEffect(() => {
-    let result = masterProductList;
+    let result = [...masterProductList];
 
-    //Filter by Category
+    // Filter by Category
     if (selectedCategory !== "All") {
-      result = result.filter(product => product.category === selectedCategory);
+      result = result.filter(product => {
+        const prodCat = (product.category || "").toLowerCase();
+        const selectedCat = selectedCategory.toLowerCase();
+        return prodCat === selectedCat;
+      });
     }
 
-    //Filter by Search Term
+    // Filter by Search Term
     if (searchTerm) {
       const lowerTerm = searchTerm.toLowerCase();
       result = result.filter(product => 
-        
-        product.name.toLowerCase().includes(lowerTerm) ||
-        product.category.toLowerCase().includes(lowerTerm)
+        (product.name || "").toLowerCase().includes(lowerTerm) ||
+        (product.category || "").toLowerCase().includes(lowerTerm)
       );
     }
 
     setDisplayedProducts(result);
   }, [searchTerm, selectedCategory, masterProductList]);
 
-
-  //HANDLERS 
+  // HANDLERS 
   const handleCategorySelect = (category) => {
     setSelectedCategory(category);
     setIsCategoryOpen(false);
@@ -75,11 +81,9 @@ const ProductPage = () => {
     const productToAdd = {
       name: newProduct.name,
       category: newProduct.category,
-      stock: parseInt(newProduct.stock) || 0,
-      price: parseInt(newProduct.price) || 0,
-      sku: `SKU-${Math.floor(Math.random() * 10000)}`,
-      sales: [], suppliers: [], alerts: [],
-      last_updated: new Date().toDateString()
+      stock_quantity: parseInt(newProduct.stock) || 0,
+      price: parseFloat(newProduct.price) || 0,
+      supplier_id: 1 
     };
 
     try {
@@ -91,12 +95,9 @@ const ProductPage = () => {
 
       if (response.ok) {
         const savedProduct = await response.json();
-        
-        // Update both lists so the new product appears immediately
-        const updatedList = [savedProduct, ...masterProductList];
-        setMasterProductList(updatedList);
-
-        
+        // Backend usually returns the new object inside a 'data' wrapper or directly
+        const newObj = savedProduct.data || savedProduct;
+        setMasterProductList(prev => [newObj, ...prev]);
         setIsModalOpen(false);
         setNewProduct({ name: "", category: "", stock: "", price: "" });
       }
@@ -107,12 +108,8 @@ const ProductPage = () => {
 
   return (
     <div className="product-page-container">
-      
-      {/* Header */}
       <div className="page-header">
         <h1 className="page-title">Product Inventory</h1>
-        
-        {/* Search Bar */}
         <div className="header-actions">
           <div className="search-bar-container">
             <FaSearch className="search-icon" />
@@ -127,7 +124,6 @@ const ProductPage = () => {
         </div>
       </div>
 
-      {/* Controls */}
       <div className="controls-section">
         <button className="btn-add" onClick={() => setIsModalOpen(true)}>
           <FaPlus /> Add product
@@ -143,16 +139,16 @@ const ProductPage = () => {
 
           {isCategoryOpen && (
             <div className="dropdown-menu">
-              <div className="dropdown-item" onClick={() => handleCategorySelect("All")}>All Categories</div>
-              <div className="dropdown-item" onClick={() => handleCategorySelect("Electronics")}>Electronics</div>
-              <div className="dropdown-item" onClick={() => handleCategorySelect("Office")}>Office</div>
-              <div className="dropdown-item" onClick={() => handleCategorySelect("Home")}>Home</div>
+              {["All", "Electronics", "Office", "Home"].map(cat => (
+                <div key={cat} className="dropdown-item" onClick={() => handleCategorySelect(cat)}>
+                  {cat === "All" ? "All Categories" : cat}
+                </div>
+              ))}
             </div>
           )}
         </div>
       </div>
 
-      {/* Product Table */}
       <div className="table-card">
         <table className="product-table">
           <thead>
@@ -168,29 +164,34 @@ const ProductPage = () => {
             {loading ? (
               <tr><td colSpan="5" className="text-center">Loading inventory...</td></tr>
             ) : (
-              displayedProducts.map((product) => (
-                <tr key={product.id || Math.random()}>
-                  <td className="product-name">{product.name}</td>
-                  <td>{product.category}</td>
-                  <td className="text-center">{product.stock}</td>
-                  <td className="text-right">{Number(product.price).toLocaleString()}</td>
-                  <td className="text-right font-bold">
-                    {(Number(product.price) * Number(product.stock)).toLocaleString()}
-                  </td>
-                </tr>
-              ))
+              displayedProducts.map((product) => {
+                // Determine stock value from whichever key the backend uses
+                const currentStock = product.stock ?? product.stock_quantity ?? 0;
+                const currentPrice = product.price ?? 0;
+                
+                return (
+                  <tr key={product.id || Math.random()}>
+                    <td className="product-name">{product.name || "N/A"}</td>
+                    <td>{product.category || "General"}</td>
+                    <td className="text-center">{currentStock}</td>
+                    <td className="text-right">{Number(currentPrice).toLocaleString()}</td>
+                    <td className="text-right font-bold">
+                      {(Number(currentPrice) * Number(currentStock)).toLocaleString()}
+                    </td>
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>
         
         {!loading && displayedProducts.length === 0 && (
           <div style={{padding: '2rem', textAlign: 'center', color: '#888'}}>
-            No products found matching "{searchTerm}"
+            No products found. Try changing the category or search term.
           </div>
         )}
       </div>
 
-      {/* Modal */}
       {isModalOpen && (
         <div className="modal-overlay">
           <div className="modal-content">

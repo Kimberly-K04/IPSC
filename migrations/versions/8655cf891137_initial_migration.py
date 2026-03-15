@@ -1,8 +1,8 @@
-"""add orders and sales tables
+"""initial migration
 
-Revision ID: df7919e825e0
-Revises: a6946ace32db
-Create Date: 2026-03-12 20:50:07.846212
+Revision ID: 8655cf891137
+Revises: 
+Create Date: 2026-03-14 21:05:39.607772
 
 """
 from alembic import op
@@ -10,8 +10,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'df7919e825e0'
-down_revision = 'a6946ace32db'
+revision = '8655cf891137'
+down_revision = None
 branch_labels = None
 depends_on = None
 
@@ -23,6 +23,18 @@ def upgrade():
     sa.Column('name', sa.String(), nullable=False),
     sa.Column('contact', sa.String(), nullable=True),
     sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('users',
+    sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('fullname', sa.String(), nullable=False),
+    sa.Column('email', sa.String(), nullable=False),
+    sa.Column('_password_hash', sa.String(), nullable=False),
+    sa.Column('role', sa.String(), nullable=True),
+    sa.Column('profile_image', sa.String(), nullable=True),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=True),
+    sa.Column('updated_at', sa.DateTime(), server_default=sa.text('now()'), nullable=True),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('email')
     )
     op.create_table('orders',
     sa.Column('id', sa.Integer(), nullable=False),
@@ -57,6 +69,7 @@ def upgrade():
     sa.Column('product_id', sa.Integer(), nullable=False),
     sa.Column('quantity', sa.Integer(), nullable=False),
     sa.Column('total_price', sa.Numeric(precision=10, scale=2), nullable=False),
+    sa.Column('created_at', sa.DateTime(), server_default=sa.text('now()'), nullable=True),
     sa.Column('order_id', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['order_id'], ['orders.id'], ),
     sa.ForeignKeyConstraint(['product_id'], ['products.id'], ),
@@ -72,5 +85,6 @@ def downgrade():
     op.drop_table('alerts')
     op.drop_table('products')
     op.drop_table('orders')
+    op.drop_table('users')
     op.drop_table('suppliers')
     # ### end Alembic commands ###
