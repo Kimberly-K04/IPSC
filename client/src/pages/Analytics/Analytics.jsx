@@ -1,3 +1,4 @@
+// src/pages/Analytics/Analytics.jsx
 import React, { useEffect, useState } from "react";
 import {
   LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer,
@@ -5,7 +6,8 @@ import {
 } from "recharts";
 import { FaDollarSign, FaUser, FaChartLine, FaBox } from "react-icons/fa";
 import { useOutletContext } from "react-router-dom";
-import './Analytics.css';
+import SalesOrdersPanel from "../../components/SalesOrdersPanel";
+import "./Analytics.css";
 
 const colors = ["#3B82F6", "#10B981", "#F59E0B", "#EF4444", "#6366F1"];
 
@@ -24,6 +26,49 @@ function KPICard({ title, value, icon, chart }) {
   );
 }
 
+export default function Analytics() {
+  const { products, orders, sales } = useOutletContext();
+
+  // Prepare chart data
+  const monthlyRevenue = [];
+  const customerGrowth = [];
+  const topProducts = [];
+  const salesByCategory = [];
+
+  // Simple aggregation logic
+  const monthlyTotals = {};
+  const categoryTotals = {};
+  const productRevenue = {};
+
+  sales.forEach(sale => {
+    // Monthly revenue
+    const month = new Date(sale.order_date || sale.created_at).toISOString().substring(0,7);
+    monthlyTotals[month] = (monthlyTotals[month] || 0) + Number(sale.total_price);
+
+    // Customer growth (count sales as proxy)
+    customerGrowth.push({ month, customers: (monthlyTotals[month] || 0) + 1 });
+
+    // Product revenue
+    productRevenue[sale.product_id] = (productRevenue[sale.product_id] || 0) + Number(sale.total_price);
+
+    // Category totals
+    const prod = products.find(p => p.id === sale.product_id);
+    if(prod) categoryTotals[prod.category] = (categoryTotals[prod.category] || 0) + Number(sale.total_price);
+  });
+
+  // Prepare arrays for charts
+  Object.keys(monthlyTotals).sort().forEach(m => monthlyRevenue.push({ month: m, revenue: monthlyTotals[m] }));
+  Object.keys(productRevenue).sort().forEach(pid => {
+    const prod = products.find(p => p.id === Number(pid));
+    if(prod) topProducts.push({ name: prod.name, revenue: productRevenue[pid] });
+  });
+  topProducts.sort((a,b)=>b.revenue - a.revenue);
+  Object.keys(categoryTotals).forEach(cat => salesByCategory.push({ category: cat, sales: categoryTotals[cat] }));
+
+  // Text colors from CSS variables
+  const rootStyles = getComputedStyle(document.documentElement);
+  const textColor = rootStyles.getPropertyValue("--textColor").trim();
+  const cardBg = rootStyles.getPropertyValue("--cardBg").trim();
 function Analytics() {
   const [monthlyRevenue, setMonthlyRevenue] = useState([]);
   const [topProducts, setTopProducts] = useState([]);
@@ -85,7 +130,7 @@ function Analytics() {
     {
       title: "Top 5 Products by Revenue",
       chart: (
-        <BarChart data={topProducts}>
+        <BarChart data={topProducts.slice(0,5)}>
           <XAxis dataKey="name" stroke={textColor} />
           <YAxis stroke={textColor} />
           <Tooltip contentStyle={{ backgroundColor: cardBg, color: textColor }} labelStyle={{ color: textColor }} />
@@ -121,6 +166,11 @@ function Analytics() {
     }
   ];
 
+  // KPI values
+  const totalRevenue = sales.reduce((sum,s)=>sum + Number(s.total_price),0);
+  const totalCustomers = sales.length; // proxy
+  const topProduct = topProducts[0]?.name || "-";
+
   return (
     <div className="analytics-page">
       <h1>Sales & Performance Analytics</h1>
@@ -154,8 +204,9 @@ function Analytics() {
         <KPICard title="Categories Sold" value={salesByCategory.length} icon={<FaBox />} />
       </div>
 
+      {/* Charts grid */}
       <div className="charts-grid">
-        {chartsData.map((c, i) => (
+        {chartsData.map((c,i)=>(
           <div className="card" key={i}>
             <h3>{c.title}</h3>
             <div className="chart-card-container">
@@ -166,8 +217,9 @@ function Analytics() {
           </div>
         ))}
       </div>
+
+      {/* Sales & Orders Panel embedded */}
+      <SalesOrdersPanel />
     </div>
   );
 }
-
-export default Analytics;
