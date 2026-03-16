@@ -13,6 +13,7 @@ function Alerts() {
   const [searchTerm, setSearchTerm] = useState('');
   const [loading] = useState(false);
 
+  const api= import.meta.env.VITE_API_BASE
   // Enrich alerts with product name and extract type from message
   const enrichedAlerts = useMemo(() => {
     return alerts.map(alert => {
@@ -27,7 +28,7 @@ function Alerts() {
 
   const acknowledgeAlert = async (id) => {
     try {
-      const res = await fetch(`/api/alerts/${id}`, {
+      const res = await fetch(`${api}/alerts/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: 'read' }),
@@ -42,7 +43,7 @@ function Alerts() {
 
   const deleteAlert = async (id) => {
     try {
-      const res = await fetch(`/api/alerts/${id}`, { method: 'DELETE' });
+      const res = await fetch(`${api}/alerts/${id}`, { method: 'DELETE' });
       if (!res.ok) throw new Error('Failed to delete alert');
       if (refreshData) refreshData();
     } catch (err) {

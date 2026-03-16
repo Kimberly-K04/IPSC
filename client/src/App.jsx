@@ -20,10 +20,12 @@ function App() {
   const [error, setError] = useState("")
   const [sending, setSending] = useState(false)
 
+  const api= import.meta.env.VITE_API_BASE
+
   const loadData=useCallback (async  ()=>{
       setLoading(true)
       try {
-        const checkSessionRes = await fetch('/api/check_session')
+        const checkSessionRes = await fetch(`${api}/check_session`)
         if (!checkSessionRes.ok) throw new Error('Not Authenticated')
         
         const userData = await checkSessionRes.json()
@@ -31,11 +33,11 @@ function App() {
 
         // Promise.allSettled allows some fetches to fail without killing the whole app
         const results = await Promise.allSettled([
-          fetch('/api/products'),
-          fetch('/api/suppliers'),
-          fetch('/api/users/me/orders'),
-          fetch('/api/users/me/sales'),
-          fetch('/api/alerts')
+          fetch(`${api}/products`),
+          fetch(`${api}/suppliers`),
+          fetch(`${api}/users/me/orders`),
+          fetch(`${api}/users/me/sales`),
+          fetch(`${api}/alerts`)
         ])
 
         const extract = async (result) => {
@@ -86,7 +88,7 @@ function App() {
       body:JSON.stringify(formObj)
     }
     try{
-      const r = await fetch(`/api/users/${encodeURIComponent(formObj.id)}`, configObj)
+      const r = await fetch(`${api}/users/${encodeURIComponent(formObj.id)}`, configObj)
       if(!r.ok) throw new Error(`Error status: ${r.status}`)
       const resData = await r.json()
       // Use the .data wrapper if the backend provides it, otherwise use the object
@@ -101,7 +103,7 @@ function App() {
   async function handleLogOut(){
     const configObj={method:'DELETE', headers:{'Content-Type':'application/json'}}
     try{
-      const r = await fetch('/api/logout', configObj)
+      const r = await fetch(`${api}/logout`, configObj)
       if (!r.ok) throw new Error('Failed to LogOut')
       setUser(null)
       navigate('/login')

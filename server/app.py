@@ -14,8 +14,8 @@ def create_app():
     app = Flask(
         __name__,
         static_url_path='',
-        static_folder='../client/build',
-        template_folder='../client/build'
+        static_folder='../client/dist',
+        template_folder='../client/dist'
     )
     config_app(app)
     app.register_blueprint(api_pb)

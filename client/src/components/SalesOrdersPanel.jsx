@@ -7,6 +7,8 @@ export default function SalesOrdersPanel({ products, orders, sales, onOrderAdded
   const [quantity, setQuantity] = useState('')
   const [loading, setLoading] = useState(false)
 
+  const api= import.meta.env.VITE_API_BASE
+
   const totalRevenue = sales.reduce((sum, s) => sum + Number(s.total_price), 0);
 
   const handleAddOrder = async (e) => {
@@ -23,7 +25,7 @@ export default function SalesOrdersPanel({ products, orders, sales, onOrderAdded
 
     setLoading(true)
     try {
-      const orderRes = await fetch('/api/orders', {
+      const orderRes = await fetch(`${api}/orders`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -41,7 +43,7 @@ export default function SalesOrdersPanel({ products, orders, sales, onOrderAdded
       const orderData = await orderRes.json()
       const newOrder = orderData.data || orderData
 
-      const saleRes = await fetch('/api/sales', {
+      const saleRes = await fetch(`${api}/sales`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -138,7 +140,7 @@ export default function SalesOrdersPanel({ products, orders, sales, onOrderAdded
             {sales.map(sale => (
               <tr key={sale.id}>
                 <td>{sale.order_id}</td>
-                <td>{products.find(p => Number(p.id) === Number(sale.product_id))?.name || "Unknown"}</td>
+                <td>{products.find(p => Number(p.id) == Number(sale.product_id))?.name || "Unknown"}</td>
                 <td>{sale.quantity}</td>
                 <td>${Number(sale.total_price).toLocaleString()}</td>
               </tr>

@@ -10,7 +10,7 @@ import * as yup from 'yup'
 function Login() {
 
     const navigate=useNavigate()
-
+    const api= import.meta.env.VITE_API_BASE
 
     const [serverError,setServerError]=useState('')
     const [showPassword,setShowPassword]=useState(false)
@@ -25,7 +25,7 @@ function Login() {
             body:JSON.stringify(values)
         }
     
-        const r = await fetch('/api/login',config_obj)
+        const r = await fetch(`${api}/login`,config_obj)
         if (r.ok){
             navigate('/')
         }else{

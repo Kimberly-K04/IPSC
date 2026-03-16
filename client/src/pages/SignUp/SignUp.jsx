@@ -8,6 +8,7 @@ import { useFormik } from 'formik'
 
 function SignUp() {
     const navigate = useNavigate()
+    const api= import.meta.env.VITE_API_BASE
 
     const [showPassword,setShowPassword]=useState(false)
     const [error,setError]=useState('')
@@ -24,7 +25,7 @@ function SignUp() {
             body:JSON.stringify(values)
         }
         try{
-            const r = await fetch('/api/signup',configObj)
+            const r = await fetch(`${api}/signup`,configObj)
             if (r.ok) {
                 navigate('/login')
             }else{
