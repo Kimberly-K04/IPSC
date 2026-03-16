@@ -1,4 +1,5 @@
 # Table of Contents
+
 - [Table of Contents](#table-of-contents)
 - [IPSC - Inventory Prediction \& Supply Chain](#ipsc---inventory-prediction--supply-chain)
   - [✨ Features](#-features)
@@ -23,6 +24,7 @@
   - [Deployment(Render)](#deploymentrender)
     - [Environment Variables on Render](#environment-variables-on-render)
   - [API Overview](#api-overview)
+  - [Screenshots of the app](#screenshots-of-the-app)
   - [ERD](#erd)
 
 # IPSC - Inventory Prediction & Supply Chain
@@ -218,7 +220,7 @@ python -m server.seed
 
 - This creates:
 
-   - Random suppliers, products, orders, sales, and alerts using Faker. It also creates  fixed users you can use to log in there names and passwords will be printed to you termianl
+  - Random suppliers, products, orders, sales, and alerts using Faker. It also creates  fixed users you can use to log in there names and passwords will be printed to you termianl
 
 ## Start Application
 
@@ -244,7 +246,7 @@ cd client; npm run dev
 
 ## Testing the app
 
-- Log in with one of the seeded users (e.g., alice@ipsc.com / 12345).
+- Log in with one of the seeded users (e.g., ```alice@ipsc.com``` / ``12345678``).
 
 - Explore the dashboard, products, alerts, and analytics pages.
 
@@ -313,6 +315,23 @@ All API endpoints are prefixed with /api/v1 and return JSON in the format {"data
 ``GET /users/me/sales`` – Return sales linked to the user's orders
 
 - And similarly for /suppliers, /alerts, /sales, /orders.
+
+
+## Screenshots of the app
+
+![Dashboard](./screenshots/dashbords.png)
+
+
+![Products](./screenshots/product.png)
+
+
+![Analytics](./screenshots/analytics.png)
+
+
+![Alerts](./screenshots/alerts.png)
+
+
+![Settings](./screenshots/settings.png)
 
 
 ## ERD
