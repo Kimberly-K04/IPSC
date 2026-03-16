@@ -198,7 +198,7 @@ SHOW port;
 **Note:** The Frontend uses a separate enviroment file inside the client folder create this ```.env``` with the following :
 
 ```env
-VITE_API_BASE=/api
+VITE_API_BASE=/api/v1
 ```
 
 - This will tell Vite to use the proxy setup in ```vite.config.js``` for API request to your Flask Backend
