@@ -24,6 +24,7 @@
   - [Deployment(Render)](#deploymentrender)
     - [Environment Variables on Render](#environment-variables-on-render)
   - [API Overview](#api-overview)
+  - [Link](#link)
   - [Screenshots of the app](#screenshots-of-the-app)
   - [ERD](#erd)
 
@@ -315,6 +316,10 @@ All API endpoints are prefixed with /api/v1 and return JSON in the format {"data
 ``GET /users/me/sales`` – Return sales linked to the user's orders
 
 - And similarly for /suppliers, /alerts, /sales, /orders.
+
+## Link
+
+- You can vist the live app here: [Live site](https://ipsc-imbi.onrender.com/)
 
 
 ## Screenshots of the app
